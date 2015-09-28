@@ -70,9 +70,9 @@ class JobsSpider(scrapy.Spider):
         url_left_part="http://www.jobs.bg/front_job_search.php?frompage="
         url_right_part="&all_cities=0&all_categories=0&all_type=0&all_position_level=1&all_company_type=1&keyword=#paging"
         
-        #for page in range(step_pagination,total_entries,step_pagination):
-        #    url = url_left_part + str(page) + url_right_part`            
-        #    yield scrapy.Request(url, callback=self.parse_search_page)
+        for page in range(step_pagination,total_entries,step_pagination):
+            url = url_left_part + str(page) + url_right_part          
+            yield scrapy.Request(url, callback=self.parse_search_page)
         
     def parse_search_page(self, response):
         #parse the current result page
@@ -104,13 +104,13 @@ class JobsSpider(scrapy.Spider):
             title = response.xpath('//*[@class=\'jobTitle\']/text()')[0].extract()
             item['title'] = title.encode('utf-8')
         except IndexError as e: #title does not exist
-            self.logger.info('Job %s - title does not exist',response.url)
+            self.logger.info('Job %s - title not specified',response.url)
         #
         try:
             ref_no = response.xpath('//*[@class=\'jobTitleViewBold\' and contains(translate(text(),\'REFNO\',\'refno\'), \'ref.no\')]//..//td[2]//text()')[0].extract()
             item['ref_no'] = ref_no
         except IndexError as e:
-            self.logger.info('Job %s - ref_no does not exist',response.url)        #
+            self.logger.info('Job %s - ref_no not specified',response.url)        #
         try:
             description = response.xpath(u'//*[@class=\'jobTitleViewBold\' and contains(text(),\'Описание\')]//..//td[2]//text()').extract()
             description = ''.join(description).strip().encode('utf-8')
@@ -128,10 +128,16 @@ class JobsSpider(scrapy.Spider):
             item['location'] = location.encode('utf-8')
         except IndexError as e:
             if location_hint != '':
-                self.logger.info('Job %s - location does not exist, but using location hint %s',response.url,location_hint)
+                self.logger.info('Job %s - location not specified, but using location hint %s',response.url,location_hint)
                 item['location'] = location_hint.encode('utf-8')
             else:
-                self.logger.info('Job %s - location does not exist',response.url)
+                self.logger.info('Job %s - location not specified',response.url)
+        #
+        try:
+            salary = response.xpath(u'//*[@class=\'jobTitleViewBold\' and contains(text(),\'Заплата\')]//..//td[2]//text()')[0].extract()
+            item['salary'] = salary.encode('utf-8')
+        except:
+            self.logger.info('Job %s - salary not specified',response.url)            
         #
         advertiser = response.xpath(u'//*[@class=\'jobTitleViewBold\' and contains(text(),\'Организация\')]//..//td[2]//tr[1]//text()').extract()
         advertiser = "".join(advertiser).strip()
@@ -140,7 +146,7 @@ class JobsSpider(scrapy.Spider):
         #date = response.xpath(u'//*[@class=\'jobTitle\']/../../../../../tr/td[3]/table/tr[2]/td[2]/table/tr[1]//text()').extract()        
         date = response.xpath(u'//*[contains(text(),\'Дата\')]//..//..//text()').extract()        
         if len(date) == 0:
-            self.logger.info('Job %s - date does not exist',response.url)
+            self.logger.info('Job %s - date not specified',response.url)
         else:
             date = ''.join(date)
             date = date.replace('\n','').replace('\t','')
@@ -148,7 +154,7 @@ class JobsSpider(scrapy.Spider):
         #
         category = response.xpath(u'//*[contains(text(),\'Категория\')]//..//..//text()').extract()        
         if len(category) == 0:
-            self.logger.info('Job %s - category does not exist',response.url)
+            self.logger.info('Job %s - category not specified',response.url)
         else:
             category = ''.join(category)
             category = category.replace('\t','')
@@ -156,7 +162,7 @@ class JobsSpider(scrapy.Spider):
         #
         Type = response.xpath(u'//*[contains(text(),\'Вид работа\')]//..//..//text()').extract()        
         if len(Type) == 0:
-            self.logger.info('Job %s - Type does not exist',response.url)
+            self.logger.info('Job %s - Type not specified',response.url)
         else:
             Type = ''.join(Type)
             Type = Type.replace('\t','')
@@ -164,7 +170,7 @@ class JobsSpider(scrapy.Spider):
         #
         level = response.xpath(u'//*[contains(text(),\'Ниво\')]//..//..//text()').extract()        
         if len(level) == 0:
-            self.logger.info('Job %s - level does not exist',response.url)
+            self.logger.info('Job %s - level not specified',response.url)
         else:
             level = ''.join(level)
             level = level.replace('\t','')
@@ -172,12 +178,14 @@ class JobsSpider(scrapy.Spider):
         #
         work_grade = response.xpath(u'//*[contains(text(),\'Вид заетост\')]//..//..//text()').extract()        
         if len(work_grade) == 0:
-            self.logger.info('Job %s - work_grade does not exist',response.url)
+            self.logger.info('Job %s - work_grade not specified',response.url)
         else:
             work_grade = ''.join(work_grade)
             work_grade = work_grade.replace('\t','')
             item['work_grade'] = work_grade.encode('utf-8')
-
+        #
+                    
+            
         yield item
                 
         

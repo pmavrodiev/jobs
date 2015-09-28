@@ -8,7 +8,7 @@
 from scrapy.item import Item, Field
 
 
-class JobItem(Item):
+class JobItem(Item):    
     url = Field()
     title = Field() #the title of the job
     ref_no = Field() #Ref.No field
@@ -20,4 +20,5 @@ class JobItem(Item):
     type = Field()
     level = Field()
     work_grade = Field()
+    salary = Field()
    

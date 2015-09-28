@@ -67,9 +67,13 @@ LOG_FILE = "jobs.log"
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'jobs.pipelines.SomePipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'jobs.pipelines.duplicates_pipeline.DuplicatesPipeline': 100,
+   'jobs.pipelines.preparedata_pipeline.PrepareDataPipeline': 200,
+   'jobs.pipelines.sqlitewriter_pipeline.SqliteWriterPipeline': 300
+}
+
+SQLITEDB = './jobs.sqlite'
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
