@@ -16,7 +16,7 @@ class RotateUserAgentMiddleware(UserAgentMiddleware):
             # Add desired logging message here.
             spider.log(
                 u'User-Agent: {} {}'.format(request.headers.get('User-Agent'), request),
-                level=log.DEBUG
+                level=log.INFO
             )
 
     #the default user_agent_list composes chrome,I E,firefox,Mozilla,opera,netscape
