@@ -55,7 +55,7 @@ class JobsSpider(scrapy.Spider):
         ###
                 
         #extract the total number of results
-        #pagination_text looks like: 1-15 от 28348        
+        #pagination_text looks like: 1-15 от 28348
         pagination_text = response.xpath('//*[@id=\'search_results\']/table/tr[2]/td[1]/text()').extract()[0]
         pagination_splitted = re.split(r'\D+',pagination_text)
         if len(pagination_splitted) != 3:
@@ -65,7 +65,7 @@ class JobsSpider(scrapy.Spider):
         start_page = pagination_splitted[0]
         step_pagination = pagination_splitted[1]
         total_entries = pagination_splitted[2]
-        
+        self.logger.info('Number of jobs - start (%s), end (%s), pagination (%s)',start_page, total_entries, step_pagination)
         #create the URLs to follow by using the information in pagination_splitted
         url_left_part="http://www.jobs.bg/front_job_search.php?frompage="
         url_right_part="&all_cities=0&all_categories=0&all_type=0&all_position_level=1&all_company_type=1&keyword=#paging"
