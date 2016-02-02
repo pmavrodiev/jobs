@@ -144,7 +144,7 @@ class JobsSpider(scrapy.Spider):
         item['advertiser'] = advertiser.encode('utf-8')
         #
         #date = response.xpath(u'//*[@class=\'jobTitle\']/../../../../../tr/td[3]/table/tr[2]/td[2]/table/tr[1]//text()').extract()        
-        date = response.xpath(u'//*[contains(text(),\'Дата\')]//..//..//text()').extract()        
+        date = response.xpath(u'//*[text()=\'Дата:\']//..//..//text()').extract()        
         if len(date) == 0:
             self.logger.info('Job %s - date not specified',response.url)
         else:
@@ -152,7 +152,7 @@ class JobsSpider(scrapy.Spider):
             date = date.replace('\n','').replace('\t','')
             item['date'] = date
         #
-        category = response.xpath(u'//*[contains(text(),\'Категория\')]//..//..//text()').extract()        
+        category = response.xpath(u'//*[text()=\'Категория:\']//..//..//text()').extract()        
         if len(category) == 0:
             self.logger.info('Job %s - category not specified',response.url)
         else:
@@ -160,7 +160,7 @@ class JobsSpider(scrapy.Spider):
             category = category.replace('\t','')
             item['category'] = category.encode('utf-8')
         #
-        Type = response.xpath(u'//*[contains(text(),\'Вид работа\')]//..//..//text()').extract()        
+        Type = response.xpath(u'//*[text()=\'Вид работа:\']//..//..//text()').extract()        
         if len(Type) == 0:
             self.logger.info('Job %s - Type not specified',response.url)
         else:
@@ -168,7 +168,7 @@ class JobsSpider(scrapy.Spider):
             Type = Type.replace('\t','')
             item['type'] = Type.encode('utf-8')
         #
-        level = response.xpath(u'//*[contains(text(),\'Ниво\')]//..//..//text()').extract()        
+        level = response.xpath(u'//*[text()=\'Ниво:\']//..//..//text()').extract()        
         if len(level) == 0:
             self.logger.info('Job %s - level not specified',response.url)
         else:
@@ -176,7 +176,7 @@ class JobsSpider(scrapy.Spider):
             level = level.replace('\t','')
             item['level'] = level.encode('utf-8')
         #
-        work_grade = response.xpath(u'//*[contains(text(),\'Вид заетост\')]//..//..//text()').extract()        
+        work_grade = response.xpath(u'//*[text()=\'Вид заетост:\']//..//..//text()').extract()        
         if len(work_grade) == 0:
             self.logger.info('Job %s - work_grade not specified',response.url)
         else:

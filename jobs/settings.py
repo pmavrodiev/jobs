@@ -73,7 +73,7 @@ ITEM_PIPELINES = {
    'jobs.pipelines.sqlitewriter_pipeline.SqliteWriterPipeline': 300
 }
 
-SQLITEDB = './jobs.sqlite'
+SQLITEDB = './jobs2.sqlite'
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
