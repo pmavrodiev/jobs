@@ -10,8 +10,7 @@ import scrapy
 import re
 from jobs.items import JobItem
 import logging
-from scrapy import spiders, signals
-from scrapy.xlib.pydispatch import dispatcher
+from scrapy import spiders
 
 class JobsSpider(spiders.Spider):
     name = "jobsSpider"
@@ -22,9 +21,6 @@ class JobsSpider(spiders.Spider):
 
     def __init__(self, Name=name, **kwargs):        
         super(JobsSpider, self).__init__(Name, **kwargs)
-        #register a signal listener for a spider close event in order
-        #to send an email upon finish
-        dispatcher.connect(self.quit, signals.spider_closed)
         '''        
         rootLogger is just a convenience attribute to shorthen the code.
         self.logger is a property object, which returns an instance of 
@@ -259,10 +255,3 @@ class JobsSpider(spiders.Spider):
             item['work_grade'] = work_grade.encode('utf-8')
         #           
         yield item
-                
-    def quit(self, spider):
-        import yagmail
-        
-        spider.rootLogger.info('Spider %s finished, sending email', spider.name)
-        
-        yag = yagmail.SMTP('pmavrodiev@gmail.com', 'password')
