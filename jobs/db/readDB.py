@@ -80,7 +80,7 @@ class SqliteReader(object):
             tokenized = self.tokenize_entry(category,job_id,db_id)
             #write the different categories into a new table
             for cat in tokenized:
-                insertSQL = 'INSERT INTO tbl_category (job_id, category) VALUES (?, ?)'
+                insertSQL = 'INSERT INTO tbl_category (job_url, category) VALUES (?, ?)'
                 self.insert_db(insertSQL,job_id,cat)
         #need to end the last transaction
         if self.write_counter % self.write_chunks: 
@@ -90,7 +90,7 @@ class SqliteReader(object):
     
         
 if __name__ == '__main__':
-    db_reader = SqliteReader('/home/pmavrodiev/Projects/jobs/jobs/jobs.sqlite')
+    db_reader = SqliteReader('/home/pmavrodiev/Projects/jobs/jobs/jobs2.sqlite.back')
     db_reader.read_db('bgjobs')
     db_reader.extract_category()
     

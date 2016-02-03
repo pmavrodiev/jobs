@@ -1,3 +1,11 @@
+"""
+Created on Sat Sep 26 19:15:10 2015
+
+@author: pmavrodiev
+
+"""
+
+
 # -*- coding: utf-8 -*-
 
 
@@ -13,7 +21,17 @@ class SqliteWriterPipeline(object):
     
     @classmethod
     def from_crawler(cls, crawler):
-        return cls(sqlite_db = crawler.settings.get('SQLITEDB'))        
+        settings_sqlite_db = crawler.settings.get('SQLITEDB')
+        #append a timestamp to the name
+        from datetime import datetime
+        dt = datetime.now()
+        tt = dt.timetuple()
+        timestamp = str(tt.tm_year) + '-' + str(tt.tm_mon)  + '-' + \
+        str(tt.tm_mday) + '_' + str(tt.tm_hour) + '-' + \
+        str(tt.tm_min)  + '-' + str(tt.tm_sec)
+        #
+        settings_sqlite_db = settings_sqlite_db + '-' + timestamp + '.sqlite'
+        return cls(sqlite_db = settings_sqlite_db)        
     
     def open_spider(self, spider):               
         self.connection = sqlite.connect(self.sqlite_db)
@@ -65,7 +83,7 @@ class SqliteWriterPipeline(object):
     # Take the item and put it in database - do not allow duplicates
     def process_item(self, item, spider):
         tokenized_category=self.tokenize_entry(item['category'],item['url'],'Категория'.decode('utf-8'),spider)     
-        tokenized_type=self.tokenize_entry(item['type'],item['url'],'Вид работа'.decode('utf-8'),spider)
+        tokenized_type=self.tokenize_entry(item['Type'],item['url'],'Вид работа'.decode('utf-8'),spider)
         tokenized_level=self.tokenize_entry(item['level'],item['url'],'Ниво'.decode('utf-8'),spider)
         tokenized_work_grade=self.tokenize_entry(item['work_grade'],item['url'],'Вид заетост'.decode('utf-8'),spider)
         
@@ -83,7 +101,7 @@ class SqliteWriterPipeline(object):
                                         item['advertiser'],
                                         item['date'],
                                         item['category'],
-                                        item['type'],
+                                        item['Type'],
                                         item['level'],
                                         item['work_grade'],
                                         item['salary']))            
@@ -113,13 +131,23 @@ class SqliteWriterPipeline(object):
         return item
 
     def tokenize_entry(self,text,job_id,token,spider):
-        ''' example text
+        '''
+        Upon parsing a job posting, the entries about the Category, Description,
+        Type of work, Level and Working type contain a key word and 
+        a bullet-type list
+        This function extracts the category name and the bullet points and
+        stores them in a separate table for easier processing later
+        
+        Example
+        -------
         Категория:
 
         Контакт центрове (Call Centers),
         Търговия, Продажби - Продавачи и помощен персонал
         
-        would return a list ['Категория', 'Контакт центрове (Call Centers)','Търговия, Продажби - Продавачи и помощен персонал']
+        Returns
+        -------
+        A list ['Контакт центрове (Call Centers)','Търговия, Продажби - Продавачи и помощен персонал']
         '''
         characters_to_strip=',/: '
         tokenized = filter(None, [x.strip(characters_to_strip).rstrip(characters_to_strip) for x in text.splitlines()])

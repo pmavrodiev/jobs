@@ -1,3 +1,10 @@
+"""
+Created on Sat Sep 26 19:15:10 2015
+
+@author: pmavrodiev
+
+"""
+
 # -*- coding: utf-8 -*-
 
 # Scrapy settings for jobs project
@@ -53,11 +60,12 @@ COOKIES_ENABLED=True
 #    'jobs.middlewares.MyCustomDownloaderMiddleware': 543,
 
 DOWNLOADER_MIDDLEWARES = {
-        'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware' : None,
+        'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware' : None,
         'jobs.comm.rotate_useragent.RotateUserAgentMiddleware' :400
 }
 
-LOG_FILE = "jobs.log"
+LOG_FILE = "jobs/logs/main.log"
+LOG_ENABLED = True
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
@@ -73,7 +81,9 @@ ITEM_PIPELINES = {
    'jobs.pipelines.sqlitewriter_pipeline.SqliteWriterPipeline': 300
 }
 
-SQLITEDB = './jobs2.sqlite'
+#The SQLite database to which the data is to be written
+# *without* extension
+SQLITEDB = 'jobs/crawled/data'
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html

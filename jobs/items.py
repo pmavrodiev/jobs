@@ -1,3 +1,10 @@
+"""
+Created on Sat Sep 26 19:15:10 2015
+
+@author: pmavrodiev
+
+"""
+
 # -*- coding: utf-8 -*-
 
 # Define here the models for your scraped items
@@ -17,7 +24,7 @@ class JobItem(Item):
     advertiser = Field() #the organization advertizing the job
     date = Field()
     category = Field()
-    type = Field()
+    Type = Field()
     level = Field()
     work_grade = Field()
     salary = Field()
