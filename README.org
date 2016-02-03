@@ -2,7 +2,7 @@
 The purpose of this project is to analyze the type of industrial demand in Bulgaria as a proxy for "true" economic development. 
 Arguably, true economic development can be "masked" behind various heavily subsidized development programs.
 Such is the case with the numerous European Union development funds in Bulgaria.
-These funds are by nature an **external** stimuli to the economy, i.e. to promote sustainable economic growth they must be used to create internal growth opportunities. 
+These funds are by nature an *external* stimuli to the economy, i.e. to promote sustainable economic growth they must be used to create internal growth opportunities. 
 
 It is a public secret that this is not the case in Bulgaria. European funds are channeled into the hands of oligarchs in a perverted scheme of allocating most development projects to businesses controlled by them. Due to the highly non-competitive nature in which these firms acquire business and operate, they do not offer any innovation (either in technology or business practices) that is paramount to economic development. 
 
