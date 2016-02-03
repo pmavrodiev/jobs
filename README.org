@@ -1,0 +1,17 @@
+* Description
+The purpose of this project is to analyze the type of industrial demand in Bulgaria as a proxy for "true" economic development. 
+Arguably, true economic development can be "masked" behind various heavily subsidized development programs.
+Such is the case with the numerous European Union development funds in Bulgaria.
+These funds are by nature an **external** stimuli to the economy, i.e. to promote sustainable economic growth they must be used to create internal growth opportunities. 
+
+It is a public secret that this is not the case in Bulgaria. European funds are channeled into the hands of oligarchs in a perverted scheme of allocating most development projects to businesses controlled by them. Due to the highly non-competitive nature in which these firms acquire business and operate, they do not offer any innovation (either in technology or business practices) that is paramount to economic development. 
+
+One difficulty in measuring the mismatch between the amount of European funds allocated to Bulgaria and economic development (the *oligarch deadweight*) is a reliably proxy for the latter.
+Since many measures exist (e.g. GDP), each with its own shortcomings, I am by no means trying to find the ultimate one. Rather, I am simply trying to look at the problem from a different (data-driven) perspective.
+
+As a proxy for economic development I am using the type of industrial demand in Bulgaria over time.
+The idea is that the categories of jobs offered on the market can give a lot of insights about the factors driving  macroeconomic indicators, such as the GDP. Imagine a city where the most sought after job is a cashier in a shop.
+What could be said about the future economic development in this city? What if, after a decade of infusing external funds into this city, the most sought after job is still a cashier in a shop? Were the funds used prudently to create self-sustained growth or were they channeled into private hands? These are the types of questions that motivated this project.
+
+To measure industrial demand, I use data from *jobs.bg*, a popular website for job postings in Bulgaria.
+The website exposes the last month of job postings, so I will be crawling it regularly (e.g. for about a year) to collect enough data.
