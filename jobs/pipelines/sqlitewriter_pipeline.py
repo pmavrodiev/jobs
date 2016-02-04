@@ -122,6 +122,7 @@ class SqliteWriterPipeline(object):
         #
         self.write_counter = self.write_counter + 1
         self.connection.commit()
+        spider.rootLogger.info('Processed %s',item['url'])
         #if not self.write_counter % self.write_chunks:
         #    spider.logger.debug('Writing chunk %s',self.write_counter)
         #    self.cursor.execute('END TRANSACTION')
@@ -152,11 +153,11 @@ class SqliteWriterPipeline(object):
         tokenized = filter(None, [x.strip(characters_to_strip).rstrip(characters_to_strip) for x in text.splitlines()])
         try:        
             if tokenized[0] != token:
-                spider.logger.warn("Warning for job %s: Cannot tokenize token %s/%s", job_id,token,tokenized[0])
+                spider.rootLogger.warning("Warning for job %s: Cannot tokenize token %s/%s", job_id,token,tokenized[0])
                 return []
         except IndexError:
             #something must be pretty wrong to come here
-            spider.logger.error('Cannot tokenize token %s for job %s. Probably failed XPATH for that token.', token,job_id)
+            spider.rootLogger.error('Cannot tokenize token %s for job %s. Probably failed XPATH for that token.', token,job_id)
             return []
         
         return tokenized[1:]        

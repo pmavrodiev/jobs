@@ -18,8 +18,8 @@ class PrepareDataPipeline(object):
             try:
                 date = item['date'].split(':')[1].split(' ')[0]
                 item['date'] = date
-            except IndexError as e:
-                spider.logger.warning("Cannot parse date %s for job %s" % (item['date'], item['url']))            
+            except IndexError:
+                spider.rootLogger.warning("Cannot parse date %s for job %s" % (item['date'], item['url']))            
                 DropItem("Cannot parse date %s for job %s" % (item['date'], item['url']))            
         
         #default values for unspecified keys        
@@ -37,7 +37,7 @@ class PrepareDataPipeline(object):
                 jobValid=True
                 break
         if not jobValid:
-            spider.logger.warning("Job expired %s" % item['url'])            
+            spider.rootLogger.warning("Job expired %s" % item['url'])            
             DropItem("Job expired %s" % item['url']) 
         else:    
             item['description_requirements'] = item['description_requirements'].encode('utf-8').encode('zlib')
