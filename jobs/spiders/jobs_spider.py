@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """
 Created on Sat Sep 26 19:15:10 2015
 
@@ -17,8 +18,14 @@ class JobsSpider(spiders.Spider):
     allowed_domains = ["jobs.bg"]
     start_urls = [
         "http://www.jobs.bg/front_job_search.php?first_search=1&all_cities=0&all_categories=0&all_type=0&all_position_level=1&all_company_type=1&keyword="
-    ]
 
+    ]
+    
+    @classmethod
+    def from_crawler(cls, crawler):
+        settings_root_log_dir = crawler.settings.get('ROOT_LOG_DIR')
+        return cls(root_log_dir = settings_root_log_dir)    
+        
     def __init__(self, Name=name, **kwargs):        
         super(JobsSpider, self).__init__(Name, **kwargs)
         '''        
@@ -32,18 +39,17 @@ class JobsSpider(spiders.Spider):
         self.rootLogger.setLevel(logging.NOTSET)
 
         logFormatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s')
-        #TODO read logdir from global settings     
-        logdir = 'jobs/logs/'
+        #logdir = 'jobs/logs/'
         # file handlers
-        infoHandler = logging.FileHandler(logdir + Name + '_info.log')
+        infoHandler = logging.FileHandler(self.root_log_dir + Name + '_info.log')
         infoHandler.setLevel(logging.INFO)
         infoHandler.setFormatter(logFormatter)
         #
-        errorHandler = logging.FileHandler(logdir + Name + '_error.log')
+        errorHandler = logging.FileHandler(self.root_log_dir + Name + '_error.log')
         errorHandler.setLevel(logging.ERROR)
         errorHandler.setFormatter(logFormatter)
         #
-        debugHandler = logging.FileHandler(logdir + Name + '_debug.log')
+        debugHandler = logging.FileHandler(self.root_log_dir + Name + '_debug.log')
         debugHandler.setLevel(logging.DEBUG)
         debugHandler.setFormatter(logFormatter)
         #
@@ -161,21 +167,21 @@ class JobsSpider(spiders.Spider):
         try:
             title = response.xpath('//*[@class=\'jobTitle\']/text()')[0].extract()
             item['title'] = title.encode('utf-8')
-        except IndexError as e: #title does not exist
+        except IndexError: #title does not exist
             #log.msg('Job %s - title not specified' % response.url, log.INFO)
             self.rootLogger.info('Job %s - title not specified',response.url)
         #
         try:
             ref_no = response.xpath('//*[@class=\'jobTitleViewBold\' and contains(translate(text(),\'REFNO\',\'refno\'), \'ref.no\')]//..//td[2]//text()')[0].extract()
             item['ref_no'] = ref_no
-        except IndexError as e:
+        except IndexError:
             #log.msg('Job %s - ref_no not specified' % response.url, log.INFO)
             self.rootLogger.info('Job %s - ref_no not specified',response.url)        #
         try:
             description = response.xpath(u'//*[@class=\'jobTitleViewBold\' and contains(text(),\'Описание\')]//..//td[2]//text()').extract()
             description = ''.join(description).strip().encode('utf-8')
             item['description_requirements'] = description
-        except IndexError as e:
+        except IndexError:
             #log.msg('Job %s - description and requirements do not exist' % response.url, log.INFO)
             self.rootLogger.info('Job %s - description and requirements do not exist',response.url)
         #
@@ -188,7 +194,7 @@ class JobsSpider(spiders.Spider):
                 self.rootLogger.info('Location hint (%s) and location (%s) do not match for job %s. Preferring location',location_hint,location,response.url)
                 #log.msg('Location hint (%s) and location (%s) do not match for job %s. Preferring location' % (location_hint,location,response.url), log.INFO)
             item['location'] = location.encode('utf-8')
-        except IndexError as e:
+        except IndexError:
             if location_hint != '':
                 self.rootLogger.info('Job %s - location not specified, but using location hint %s',response.url,location_hint)
                 #log.msg('Job %s - location not specified, but using location hint %s' % (response.url,location_hint), log.INFO)                

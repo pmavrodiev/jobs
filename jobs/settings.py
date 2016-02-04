@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Created on Sat Sep 26 19:15:10 2015
 
@@ -5,7 +7,7 @@ Created on Sat Sep 26 19:15:10 2015
 
 """
 
-# -*- coding: utf-8 -*-
+
 
 # Scrapy settings for jobs project
 #
@@ -66,7 +68,8 @@ DOWNLOADER_MIDDLEWARES = {
 
 LOG_FILE = "jobs/logs/main.log"
 LOG_ENABLED = True
-
+#
+ROOT_LOG_DIR = "jobs/logs/"
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
 #EXTENSIONS = {

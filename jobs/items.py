@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Created on Sat Sep 26 19:15:10 2015
 
@@ -5,7 +7,7 @@ Created on Sat Sep 26 19:15:10 2015
 
 """
 
-# -*- coding: utf-8 -*-
+
 
 # Define here the models for your scraped items
 #

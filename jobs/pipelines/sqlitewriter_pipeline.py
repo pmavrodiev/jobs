@@ -1,12 +1,11 @@
+# -*- coding: utf-8 -*-
+
 """
 Created on Sat Sep 26 19:15:10 2015
 
 @author: pmavrodiev
 
 """
-
-
-# -*- coding: utf-8 -*-
 
 
 import sqlite3 as sqlite
@@ -82,7 +81,7 @@ class SqliteWriterPipeline(object):
         
     # Take the item and put it in database - do not allow duplicates
     def process_item(self, item, spider):
-        tokenized_category=self.tokenize_entry(item['category'],item['url'],'Категория'.decode('utf-8'),spider)     
+        tokenized_category=self.tokenize_entry(item['category'],item['url'],'Категория'.decode('utf-8'),spider)
         tokenized_type=self.tokenize_entry(item['Type'],item['url'],'Вид работа'.decode('utf-8'),spider)
         tokenized_level=self.tokenize_entry(item['level'],item['url'],'Ниво'.decode('utf-8'),spider)
         tokenized_work_grade=self.tokenize_entry(item['work_grade'],item['url'],'Вид заетост'.decode('utf-8'),spider)
@@ -153,11 +152,11 @@ class SqliteWriterPipeline(object):
         tokenized = filter(None, [x.strip(characters_to_strip).rstrip(characters_to_strip) for x in text.splitlines()])
         try:        
             if tokenized[0] != token:
-                spider.logger.error("Warning for job %s: Cannot tokenize token %s/%s" % (job_id,token,tokenized[0]))
+                spider.logger.warn("Warning for job %s: Cannot tokenize token %s/%s", job_id,token,tokenized[0])
                 return []
-        except IndexError as e:
+        except IndexError:
             #something must be pretty wrong to come here
-            spider.logger.error('Cannot tokenize token %s for job %s. Probably failed XPATH for that token.',(token,job_id))
+            spider.logger.error('Cannot tokenize token %s for job %s. Probably failed XPATH for that token.', token,job_id)
             return []
         
         return tokenized[1:]        

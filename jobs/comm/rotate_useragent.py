@@ -1,3 +1,7 @@
+#!/usr/bin/python
+#-*-coding:utf-8-*-
+
+
 """
 Created on Sat Sep 26 19:15:10 2015
 
@@ -5,8 +9,6 @@ Created on Sat Sep 26 19:15:10 2015
 
 """
 
-#!/usr/bin/python
-#-*-coding:utf-8-*-
 
 import random
 from scrapy.downloadermiddlewares.useragent import UserAgentMiddleware
