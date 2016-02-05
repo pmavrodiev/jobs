@@ -156,7 +156,7 @@ class SqliteWriterPipeline(object):
                 spider.rootLogger.warning("Warning for job %s: Cannot tokenize token %s/%s", job_id,token,tokenized[0])
                 return []
         except IndexError:
-            #something must be pretty wrong to come here
+            #the token has been missing from the job posting html
             spider.rootLogger.error('Cannot tokenize token %s for job %s. Probably failed XPATH for that token.', token,job_id)
             return []
         

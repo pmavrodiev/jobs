@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+        <style type='text/css'>
+        	#map { height: 85vh; width:60vw}
+        	.province-label {
+            	font-size: 1.2em;
+            	font-weight: 300;
+            /* Use color, background, set margins for offset, etc */
+        	}        	
+        </style>
+        
+        <script src="/server/lib/leaflet/leaflet-src.js"></script>       
+        <title>Jobs Viz</title>
+    </head>
+    <body>
+        <h1>Bulgarian Municipalities</h1>
+        <!-- add the leaflet map-->
+        <div id="map"></div>
+        <script src="/server/data/provinces_names.geojson"></script>
+        <script src="/server/data/municipalities_names.geojson"></script>
+        <script src="/server/bgjson.js"></script>
+        <!-- add d3.js -->
+        
+    </body>
+</html>
