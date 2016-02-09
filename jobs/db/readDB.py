@@ -43,47 +43,7 @@ class SqliteReader(object):
     def runQuery(self,sql_query):
         self.cursor.execute(sql_query)
         return self.cursor.fetchall()
-    
-    def read_db(self,tablename):
-        self.open_db()
-        self.cursor.execute('SELECT * FROM {}'.format(tablename))   
-        self.all_rows = self.cursor.fetchall()
-        self.connection.close()
-
-    def insert_db(self,insert_what,*args):
-        if not self.write_counter % self.write_chunks: #new transaction
-            self.cursor.execute('BEGIN TRANSACTION')
-       
-        self.cursor.execute(insert_what,tuple(args))
-        self.write_counter = self.write_counter + 1
-        if not self.write_counter % self.write_chunks:
-            self.cursor.execute('END TRANSACTION')
-            self.connection.commit()
             
-            
-    
-    def tokenize_entry(self,text,job_id,db_id):
-        ''' example text
-        Категория:
-
-        Контакт центрове (Call Centers),
-        Търговия, Продажби - Продавачи и помощен персонал
-        
-        would return a list ['Категория', 'Контакт центрове (Call Centers)','Търговия, Продажби - Продавачи и помощен персонал']
-        '''
-        characters_to_strip=',/: '
-        tokenized = filter(None, [x.strip(characters_to_strip).rstrip(characters_to_strip) for x in text.splitlines()])
-        try:        
-            if tokenized[0].encode('utf-8') != 'Категория':
-                print("Warning for job %s: Cannot tokenize category" % db_id)
-                return []
-        except IndexError:
-            #something must be pretty wrong to come here
-            print(job_id)
-            return []
-        
-        return tokenized[1:]        
-        
     def extract_category(self):
         self.open_db()
         #
