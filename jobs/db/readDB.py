@@ -17,7 +17,7 @@ import logging
 #set up the logger
 LOGGING_LEVEL = logging.INFO
 logging.basicConfig(level=LOGGING_LEVEL)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('readDB')
 # 
 
 class SqliteReader(object):
@@ -207,7 +207,7 @@ if __name__ == '__main__':
     #key: nuts3 code of a province
     #values: {nuts4 code: count of job postings in this nuts4 municipality}
     all_jobs = {key: dict() for key in provinces_dict.values()}
-    
+    njobs_resolved=0
     for job in all_rows:
         '''
         For some reason the unicode for "Обзор" is messed up.
@@ -217,6 +217,7 @@ if __name__ == '__main__':
         but for now simply replacing the leading character with the proper
         unicode byte works.
         '''
+        job_resolved=False
         job_posting_url = job[1]
         location=job[5].replace('O',u'\u041e')
         location=nowhitespaces.sub("",location).lower()
@@ -236,7 +237,6 @@ if __name__ == '__main__':
         #provinces.csv
                 
         #try to find the settlement from 'location' in the EKATTE data
-       
         match_list = [place == location for place in ekatte_locations]
         #get the indeces of the matches
         found = list(compress(xrange(len(match_list)),match_list))
@@ -262,6 +262,8 @@ if __name__ == '__main__':
                 all_jobs[nuts3][nuts4] = all_jobs[nuts3][nuts4] + 1
             else:
                 all_jobs[nuts3][nuts4] = 1
+            
+            job_resolved=True
         #no settlement with name 'location' has been found in the EKATTE data
         #let's hope that location2 has been resolved
         elif len(found) == 0:
@@ -270,7 +272,8 @@ if __name__ == '__main__':
                 if all_jobs[nuts3].has_key("unnamed"):
                     all_jobs[nuts3]["unnamed"] = all_jobs[nuts3]["unnamed"] + 1
                 else:
-                    all_jobs[nuts3]["unnamed"] = 1               
+                    all_jobs[nuts3]["unnamed"] = 1
+                job_resolved=True
             else:
                 logger.info('Cannot find location %s and resolve location2 %s for job %s' , location, location2, job_posting_url)
         #multiple matches exist in the EKATTE data for the settlement in 'location'   
@@ -302,7 +305,8 @@ if __name__ == '__main__':
                     all_jobs[nuts3][nuts4] = all_jobs[nuts3][nuts4] + 1
                 else:
                     all_jobs[nuts3][nuts4] = 1
-            #no location2, try to find the right settlement with name 'location'
+                job_resolved=True
+            #location2 not resolved, try to find the right settlement with name 'location'
             else:
                 '''
                 Тhe entry is e.g. Габрово/България
@@ -312,8 +316,8 @@ if __name__ == '__main__':
                     гр.,Габрово,GAB,GAB05
                     с.,Габрово,KRZ,KRZ35
                     
-                If location2 is simply 'българия' then always assume the job
-                posting is in the city.
+                If location2 is simply 'българия' then always assume that 
+                'location' is a city.
                 '''
                 if location2_bulgaria:
                     ekatte_loc = ekatte_locations[found[0]]
@@ -329,13 +333,17 @@ if __name__ == '__main__':
                                 all_jobs[nuts3][nuts4] = all_jobs[nuts3][nuts4] + 1
                             else:
                                 all_jobs[nuts3][nuts4] = 1
+                            job_resolved=True
                     #no cities exist with the name 'location'
                     else:
                         logger.info("Cannot resolve location %s to a main city in the absense of location2 for job %s" , location, job_posting_url)           
                 #giving up on this job, nothing can be done        
                 else:
                     logger.info("location2 (%s) and location (%s) cannot be resolved for job %s. Giving up." , location2, location, job_posting_url)
-  
+        #for job in all_rows: 
+        if job_resolved:
+            njobs_resolved=njobs_resolved+1
        
     #
+    logging.info("Total jobs %d, resolved %d", len(all_rows), njobs_resolved)
     print(all_jobs['SLS'])
