@@ -186,15 +186,18 @@ class JobsSpider(spiders.Spider):
             self.rootLogger.info('Job %s - description and requirements do not exist',response.url)
         #
         location_hint = response.meta['location_hint'].decode('utf-8')
+       
         try:
             location = response.xpath(u'//*[@class=\'jobTitleViewBold\' and contains(text(),\'Месторабота\')]//..//td[2]//text()')[0].extract()
-            location = location.split('/')[0] # e.g. София / България            
+            location_splitted = location.split('/')            
+            location = location_splitted[0] # e.g. София / България            
             location = re.sub(r'\s+','',location)                        
             if  location_hint != location:
                 self.rootLogger.info('Location hint (%s) and location (%s) do not match for job %s. Preferring location',location_hint,location,response.url)
                 #log.msg('Location hint (%s) and location (%s) do not match for job %s. Preferring location' % (location_hint,location,response.url), log.INFO)
             item['location'] = location.encode('utf-8')
-        except IndexError:
+            
+        except IndexError:          
             if location_hint != '':
                 self.rootLogger.info('Job %s - location not specified, but using location hint %s',response.url,location_hint)
                 #log.msg('Job %s - location not specified, but using location hint %s' % (response.url,location_hint), log.INFO)                
@@ -202,6 +205,11 @@ class JobsSpider(spiders.Spider):
             else:
                 #log.msg('Job %s - location not specified' % response.url, log.INFO)
                 self.rootLogger.info('Job %s - location not specified',response.url)
+        try:
+            second_part = location_splitted[1]
+            item['location2'] = second_part.strip().encode('utf-8')
+        except IndexError:
+            self.rootLogger.info('Job %s - location2 not specified',response.url)
         #
         try:
             salary = response.xpath(u'//*[@class=\'jobTitleViewBold\' and contains(text(),\'Заплата\')]//..//td[2]//text()')[0].extract()

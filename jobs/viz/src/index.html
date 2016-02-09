@@ -5,12 +5,52 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
         <style type='text/css'>
-        	#map { height: 85vh; width:60vw}
+        	#map { height: 85vh; 
+        		   width:60vw;
+        		   float:left;
+        		 }
+        		
+        	.leaflet-container {
+        	}
         	.province-label {
             	font-size: 1.2em;
             	font-weight: 300;
             /* Use color, background, set margins for offset, etc */
-        	}        	
+        	}
+        	#d3plot {
+        		height: 85vh; 
+        		width:35vw;
+        		overflow:hidden;
+        	}
+        	#job_breakdown {
+        		width:90%;
+        		height:10%;
+        		overflow:hidden;
+        	}
+        	#chart {
+				width: 90%;
+				height: 90%;
+				overflow:hidden;
+			}
+			#d3_svg_container {
+				width:100%;
+				height:90%				
+			}
+			#sidebar {
+				float:right;
+				position:relative;
+				width:100px;
+				overflow:hidden;
+			}
+			#explanation {
+				position:relative;
+				left:140px;
+				top:180px;
+				width: 140px;
+				text-align:center;
+				color: #666;
+				z-index:-1;
+			}
         </style>
         
         <script src="/server/lib/leaflet/leaflet-src.js"></script>       
@@ -24,6 +64,24 @@
         <script src="/server/data/municipalities_names.geojson"></script>
         <script src="/server/bgjson.js"></script>
         <!-- add d3.js -->
+        <script src="/server/lib/d3js/d3.js"></script>
+        <div id="d3plot">
+        	<div id="job_breakdown"></div>
+        	<!-- -->
+        	<div id="chart">
+        		<div id="explanation" style="visibility: show;">
+          			<span id="percentage"></span><br/>
+          				of total job postings
+        		</div>        		
+        	</div>
+        	<!-- -->
+        	<div id="sidebar">
+      			<input type="checkbox" id="togglelegend"> Legend<br/>
+      			<div id="legend" style="visibility: hidden;"></div>
+    		</div>        	
+        </div>
+        
+        <script src="/server/d3plot.js"></script>
         
     </body>
 </html>

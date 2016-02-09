@@ -22,7 +22,20 @@ class JobItem(Item):
     title = Field() #the title of the job
     ref_no = Field() #Ref.No field
     description_requirements = Field() #description and requirements
-    location = Field() #location of the job
+    location = Field() #location of the job, typically the city
+    '''    
+    Ff location is smaller than a city, e.g. a village the job posting 
+    mentions the province e.g.: село Приселци / Област Варна / България
+    
+    In this case the extracted location will be село Приселци, but we 
+    need to extract also the province, which together with the EKATTE list 
+    will allows to infer the municipality.
+    
+    Ideally we could do without this, but there are villages with the same
+    name belonging to difference provinces. Hence, the village name and
+    the EKATTE list is not enough    
+    '''
+    location2 = Field() #province 
     advertiser = Field() #the organization advertizing the job
     date = Field()
     category = Field()

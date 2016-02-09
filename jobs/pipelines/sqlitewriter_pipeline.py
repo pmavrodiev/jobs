@@ -42,6 +42,7 @@ class SqliteWriterPipeline(object):
                     'ref_no TEXT,' + \
                     'description_requirements BLOB, ' + \
                     'location TEXT, '+ \
+                    'location2 TEXT, '+ \
                     'advertiser TEXT, '+ \
                     'date TEXT, ' + \
                     'category TEXT, '+  \
@@ -88,8 +89,8 @@ class SqliteWriterPipeline(object):
         
         
         insert_sql = 'insert into bgjobs (url,title,ref_no,description_requirements,' + \
-                        'location,advertiser,date,category,type,level,work_grade,salary) ' + \
-                        'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                        'location,location2,advertiser,date,category,type,level,work_grade,salary) ' + \
+                        'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
                         
         #if not self.write_counter % self.write_chunks: #new transaction
         #    self.cursor.execute('BEGIN TRANSACTION')          
@@ -97,6 +98,7 @@ class SqliteWriterPipeline(object):
                                         item['ref_no'],
                                         sqlite.Binary(item['description_requirements']),
                                         item['location'],
+                                        item['location2'],
                                         item['advertiser'],
                                         item['date'],
                                         item['category'],
