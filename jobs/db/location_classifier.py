@@ -229,9 +229,10 @@ class LocationClassifier:
 
         # try to find the settlement from 'location' in the EKATTE data
         match_list = [place == location for place in self.ekatte_locations]
+
         # get the indeces of the matches
         found = list(compress(xrange(len(match_list)), match_list))
-        #
+
         if len(found) == 1:
             ekatte_loc = self.ekatte_locations[found[0]]
             set_type_dict = self.ekatte_dict[ekatte_loc]
@@ -239,7 +240,8 @@ class LocationClassifier:
             if len(set_type_dict.keys()) != 1:
                 self.logger.error(("Inconsistent settlement types "
                                    "for settlement %s"), ekatte_loc)
-                return  # TODO propagate this error upward
+                return return_codes
+            #
             nuts3 = set_type_dict[set_type_dict.keys()[0]][0][0]
             nuts4 = set_type_dict[set_type_dict.keys()[0]][0][1]
             # check for mismatch between EKATTE nuts3 and 'location2'
@@ -254,7 +256,6 @@ class LocationClassifier:
 
             # add the job posting in its corresponding georgaphical 'bucket'
             return_codes = (nuts3, nuts4)
-            # all_jobs[nuts3][nuts4] = all_jobs[nuts3].get(nuts4, 0) + 1
 
         # no settlement with name 'location' has been found in the
         # EKATTE data. Let's hope that location2 has been resolved
@@ -262,7 +263,6 @@ class LocationClassifier:
             if location2_resolved:
                 nuts3 = self.provinces_dict[location2_cleaned]
                 return_codes = (nuts3, UNNAMED)
-                # all_jobs[nuts3][UNNAMED]=all_jobs[nuts3].get(UNNAMED, 0) + 1
             else:
                 self.logger.info(("Cannot find location %s and resolve "
                                   "location %s for job %s"),
@@ -297,10 +297,9 @@ class LocationClassifier:
 
                 # add the job posting to the proper bucket
                 return_codes = (nuts3, nuts4)
-                # all_jobs[nuts3][nuts4] = all_jobs[nuts3].get(nuts4, 0) + 1
 
             # location2 not resolved,
-            # try to find the right settlement with name 'location'
+            # try to find a type CITY settlement with a name 'location'
             else:
                 '''
                 Тhe entry is e.g. Габрово/България
@@ -333,7 +332,7 @@ class LocationClassifier:
                                           "main city in the absense of "
                                           "location2 for job %s"),
                                          location, job_posting_url)
-                        # giving up on this job, nothing can be done
+                # giving up on this job, nothing can be done
                 else:
                     self. logger.info(("location2 (%s) and location (%s) "
                                        " cannot be resolved for job %s. "
@@ -344,17 +343,3 @@ class LocationClassifier:
                           location, location2,
                           return_codes[0], return_codes[1], job_posting_url)
         return return_codes
-"""
-if __name__ == '__main__':
-    jc = LocationClassifier("Ek_atte.csv", "provinces.csv",
-                            "../crawled/data-2016-2-6_21-50-52.sqlite")
-
-    all_rows = jc.read_sqlite()
-
-    for row in all_rows:
-        cat = jc.categorize_job(row)
-
-    #
-    # logging.info("Total jobs %d, resolved %d", len(all_rows), njobs_resolved)
-    # print(all_jobs['SLS'])
-"""
