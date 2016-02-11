@@ -61,7 +61,6 @@ Given these 3 data sources a job posting is processed in the following way.
   2.3. If not found use 'location2' to extract the province.
 """
 
-import sys
 import csv
 from itertools import compress
 import logging
@@ -125,7 +124,7 @@ class LocationClassifier:
         try:
             ekatte_file = open(self.f_ekatte, 'r')
         except IOError as e:
-            logging.error("%s", e)
+            self.logging.error("%s", e)
             return (None, None)
         ekatte_csv = csv.reader(ekatte_file, delimiter=',')
         ekatte_csv.next()   # skip the header
@@ -186,7 +185,7 @@ class LocationClassifier:
         province_file.close()
         return (provinces_dict, provinces)
 
-    def categorize_job(self, job_array):
+    def classify_job_location(self, **kwargs):
 
         """The main workhorse of this class
         """
@@ -204,11 +203,20 @@ class LocationClassifier:
 
         return_codes = (None, None)  # (nuts3, nuts4)
         #
-        job_posting_url = job_array[self.db_reader.url]
-        location = job_array[self.db_reader.location].replace('O', u'\u041e')
-        location = nowhitespaces.sub("", location).lower()
+        job_posting_url = kwargs.pop("job_url", None)
+        location = kwargs.pop("location", None)
+        location2 = kwargs.pop("location2", None)
+        if not (job_posting_url and location and location2):
+            self.logger.error("Inadequate kwargs")
+            return return_codes
+        # for some reason some entries for Обзор have a 'O'
+        # instead of the unicode code for the cyrrilic 'O' u'\u041e'
+        # probably the issue comes from the web crawler (TODO: look into it)
+        # here, we simply replace the 'O' with the proper unicode char.
+        location = location.replace('O', u'\u041e').lower()
+        location = nowhitespaces.sub("", location)
         location = remove_artifacts(location)
-        location2 = job_array[self.db_reader.location2].lower()
+        location2 = location2.lower()
         location2_bulgaria = False
         if location2 == BULGARIA:
             location2_bulgaria = True
