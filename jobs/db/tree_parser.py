@@ -18,12 +18,13 @@ class TreeParser(Tree):
     # set up the logger
     LOGGING_LEVEL = logging.ERROR
     logging.basicConfig(level=LOGGING_LEVEL)
-    logger = logging.getLogger('tree_parser')
+    logger = logging.getLogger(__name__)
 
     def __init__(self, fname):
         super(TreeParser, self).__init__()
         self.filename = fname
         self.initialized = False
+        print(__name__)
 
     # count
     def count_node_data(self, node_identifier):
@@ -102,7 +103,7 @@ class TreeParser(Tree):
                 #
         self.initialized = True
 
-"""
+
 
 if __name__ == "__main__":
     tp = TreeParser("jobCategories.txt")
@@ -115,4 +116,4 @@ if __name__ == "__main__":
 
     for node in tp.expand_tree("root", mode=1):
         print(node)
-"""
+

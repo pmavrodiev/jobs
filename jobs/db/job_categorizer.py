@@ -6,16 +6,23 @@ Created on Sat Oct  3 16:43:50 2015
 
 @author: Pavlin Mavrodiev
 """
+from __future__ import division
 
 from location_classifier import LocationClassifier
 from sqlitereader import SqliteReader
 from tree_parser import TreeParser
-from __future__ import division
+
 
 import sys
+import logging
 
 
 class JobCategorizer(object):
+
+    # set up the logger
+    LOGGING_LEVEL = logging.WARNING
+    logging.basicConfig(level=LOGGING_LEVEL)
+    logger = logging.getLogger(__name__)
 
     # takes initialized instances
     def __init__(self, location_classifier, tree_parser, sqlite_reader):
@@ -27,11 +34,14 @@ class JobCategorizer(object):
     def populate_tree(self):
         if not (self.lc.ekatte_dict and lc.ekatte_locations and
                 tp.initialized):
-            # TODO:More graceful logging and exit
-            print("Something went wrong with the initialization. Investigate")
+            # TODO:More graceful exit. Best propagate error codes.
+            self.logger.error(("Something went wrong with the initialization."
+                               " Investigate"))
             sys.exit(1)
 
         sqlite_reader.open_db()
+        # TODO: the column ids are hard-coded. Not nice. Get them from the
+        # db schema
         db_url = 1
         db_location = 5
         db_location2 = 6
@@ -77,6 +87,8 @@ class JobCategorizer(object):
     # stub
     def json_writer(self):
         # TODO: implement
+        pass
+
 
 if __name__ == "__main__":
     sqlite_reader = SqliteReader("../crawled/data-2016-2-6_21-50-52.sqlite")

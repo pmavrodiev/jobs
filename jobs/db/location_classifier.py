@@ -76,7 +76,7 @@ class LocationClassifier:
     # set up the logger
     LOGGING_LEVEL = logging.ERROR
     logging.basicConfig(level=LOGGING_LEVEL)
-    logger = logging.getLogger('location_classifier')
+    logger = logging.getLogger(__name__)
 
     def __init__(self, ekatte_file, provinces_file):
         self.f_ekatte = ekatte_file
