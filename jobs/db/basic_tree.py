@@ -12,6 +12,9 @@ http://stackoverflow.com/questions/2482602/a-general-tree-implementation-in-pyth
 Alternatively the original source code should be available here:
 http://www.quesucede.com/page/show/id/python_3_tree_implementation
 
+Only minor modifications have been made to the original class pertaining to
+extra attributes of Node (altname, data) and renaming of methods
+
 """
 
 import uuid
@@ -145,7 +148,7 @@ class Tree(object):
         return sanitize_id(node_identifier) in self.nodes
 
 
-
+"""
 if __name__ == "__main__":
 
     tree = Tree()
@@ -171,4 +174,4 @@ if __name__ == "__main__":
         print(node)
     print("="*80)
 
-
+"""
