@@ -17,7 +17,7 @@ var map = L.map('map', {
 		keyboard:false,
 		zoomControl:false,
 		center:new L.LatLng(42.6917, 25.4004),
-		zoom:8
+		zoom:7.5
 	});
 
 /*set up the feature styles*/
@@ -165,6 +165,6 @@ map.addLayer(featureMunicipalitiesLayer);
 
 /*Mouse events for the map*/
 map.on('move', function (e) {
-	console.log(map.getPanes());
+	//console.log(map.getPanes());
 	
 });

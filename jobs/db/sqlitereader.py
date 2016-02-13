@@ -28,8 +28,11 @@ class SqliteReader(object):
         self.connection.close()
 
     def runQuery(self, sql_query):
-        self.cursor.execute(sql_query)
-        return self.cursor.fetchall()
+        try:
+            self.cursor.execute(sql_query)
+            return self.cursor.fetchall()
+        except sqlite.ProgrammingError as e:
+            raise e
 
     def extract_category(self):
         self.open_db()

@@ -6,7 +6,7 @@
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
         <style type='text/css'>
         	#map { height: 85vh; 
-        		   width:60vw;
+        		   width:50vw;
         		   float:left;
         		 }
         		
@@ -19,7 +19,7 @@
         	}
         	#d3plot {
         		height: 85vh; 
-        		width:35vw;
+        		width:45vw;
         		overflow:hidden;
         	}
         	#job_breakdown {
@@ -28,28 +28,36 @@
         		overflow:hidden;
         	}
         	#chart {
-				width: 90%;
+        		position: relative;
+				width: 100%;
 				height: 90%;
 				overflow:hidden;
 			}
 			#d3_svg_container {
 				width:100%;
-				height:90%				
+				height:90%;
+				overflow: hidden;	
 			}
-			#sidebar {
-				float:right;
-				position:relative;
-				width:100px;
-				overflow:hidden;
+			#stats {
+				  margin: auto;  
+				  position: relative;
+  				  left:45%;
+  				  right: 0;
+  				  top: 50%;
+  				  bottom: 0;
+    			  color: #666;
+				  z-index:-1;
 			}
-			#explanation {
-				position:relative;
-				left:140px;
-				top:180px;
-				width: 140px;
-				text-align:center;
-				color: #666;
-				z-index:-1;
+			#percentage {
+				font-size: 2em;
+			}
+			#number {
+				font-size: 1.3em;			
+			}
+			#container {
+				width:100%;
+				height: 100%;
+				overflow: hidden;
 			}
         </style>
         
@@ -69,19 +77,17 @@
         	<div id="job_breakdown"></div>
         	<!-- -->
         	<div id="chart">
-        		<div id="explanation" style="visibility: show;">
-          			<span id="percentage"></span><br/>
-          				of total job postings
+        		<div id="stats" style="visibility: hidden;">
+          			<span id="percentage">" "</span><br/><span id="number">" "</span>
         		</div>        		
         	</div>
-        	<!-- -->
-        	<div id="sidebar">
-      			<input type="checkbox" id="togglelegend"> Legend<br/>
-      			<div id="legend" style="visibility: hidden;"></div>
-    		</div>        	
+        	<!-- -->       	
         </div>
         
         <script src="/server/d3plot.js"></script>
+        <script type="text/javascript">
+        	displayD3("../samples/all.csv");
+        </script>
         
     </body>
 </html>

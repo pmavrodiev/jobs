@@ -48,6 +48,7 @@ class Node:
         self.expanded = expanded
         self.__parent_pointer = None  # pointer to parent
         self.__children_pointer = []  # pointer to the children
+        self.is_leaf = True
         self.data = None  # potential payload
 
     @property
@@ -76,12 +77,14 @@ class Node:
         # append node to the children of the parent
         if mode is _ADD:
             self.__children_pointer.append(sanitize_id(identifier))
+            self.is_leaf = False  # this node is not a leaf anymore
         # remove node from the children of the parent
         elif mode is _DELETE:
             self.__children_pointer.remove(sanitize_id(identifier))
         # replace the children of the parent with this node
         elif mode is _INSERT:
             self.__children_pointer = [sanitize_id(identifier)]
+            self.is_leaf = False  # this node is not a leaf anymore
 
 
 class Tree(object):
@@ -102,6 +105,17 @@ class Tree(object):
             self.__update_children_pointer(parent_identifier,
                                            node.identifier, _ADD)
             node.parent_pointer = parent_identifier
+
+    # is the given node a leaf, i.e. no children
+    def is_leaf(self, node_identifier):
+        return self[node_identifier].is_leaf
+
+    def is_root(self, node_identifier):
+        return False if self[node_identifier].parent_pointer else True
+
+    # return the node_identifiers of all leaves
+    def get_leaves(self):
+        return filter(self.is_leaf, self.nodes.keys())
 
     # update the children pointer of target_node with this_node
     def __update_children_pointer(self, target_node, this_node, mode):
@@ -130,10 +144,6 @@ class Tree(object):
                 queue = expansion + queue[1:]  # depth-first
             elif mode is _WIDTH:
                 queue = queue[1:] + expansion  # breadth-first
-
-    # returh the children of this_node
-    def is_branch(self, this_node):
-        return self[this_node].children_pointer
 
     def __getitem__(self, node_identifier):
         return self.nodes.get(sanitize_id(node_identifier))
