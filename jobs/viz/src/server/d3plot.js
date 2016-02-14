@@ -1,14 +1,3 @@
-/**
- * TODO: 1. Small glitch with scaling of the svg container.
- *          The computed scaling factor is slighly underestimated
- * 	        and as a result the svg graph overflows when window is downsized.
- *          This has to to with the radius of the underlying circle.
- *          So far manual hack in computeScaling
- * 
- *       2. Glitch with hiding the description box when mouse leaves the svg container.
- *          The visibility property is set to hidden, but somehow doesn't get registered
- *          and the description remains visible.
- */
 
 
 // Breadcrumb dimensions: height, spacing, width of tip/tail.
@@ -34,9 +23,6 @@ var partition = d3.layout.partition()
     .size([2 * Math.PI, radius * radius])
     .value(function(d) { return d.size; });
 
-var vis = vis2.append("svg:g")
-    			.attr("id", "container")
-    			.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
 var arc = d3.svg.arc()
     			.startAngle(function(d) { return d.x; })
@@ -44,9 +30,39 @@ var arc = d3.svg.arc()
    		 		.innerRadius(function(d) { return Math.sqrt(d.y); })
    		 		.outerRadius(function(d) { return Math.sqrt(d.y + d.dy); });
 
+var vis = 0;
+
+// Add the svg area.
+var trail = d3.select("#job_breakdown").append("svg:svg")
+      .attr("id", "trail");
+// Add the label at the end, for the percentage.
+trail.append("svg:text")
+    .attr("id", "endlabel")
+    .style("fill", "#000");
+ 
+
+
+function tearDown() {
+	vis2.select("g").remove();
+}
+
 
 /* Main function called from the outside */
 function displayD3(filename) {
+	// tear down the existing svg objects
+	tearDown();
+
+	vis = vis2.append("svg:g")
+    			.attr("id", "container")
+    			.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+    // Bounding circle underneath to make it easier to detect
+    // when the mouse leaves the parent g.
+	vis.append("svg:circle")
+    	  .attr("r",  0.7 * radius)
+      	  .attr("id", "circle")
+          .style("opacity", 0);
+
 	// Use d3.text and d3.csv.parseRows so that we do not need to have a header
 	// row, and can receive the csv as an array of arrays.
 	d3.text(filename, function(text) {
@@ -100,48 +116,23 @@ function buildHierarchy(csv) {
   return root;
 };
 
-function initializeBreadcrumbTrail() {
-  // Add the svg area.
-  var trail = d3.select("#job_breakdown").append("svg:svg")
-      .attr("width", width)
-      .attr("height", 50)
-      .attr("id", "trail");
-  // Add the label at the end, for the percentage.
-  trail.append("svg:text")
-    .attr("id", "endlabel")
-    .style("fill", "#000");
-}
 
 
 // Main function to draw and set up the visualization, once we have the data.
 function createVisualization(json) {
-
-  // Basic setup of page elements.
-  initializeBreadcrumbTrail();
-
-  // Bounding circle underneath to make it easier to detect
-  // when the mouse leaves the parent g.
-  vis.append("svg:circle")
-      .attr("r",  0.7*radius)
-      .style("opacity", 0);
-
-
-  // For efficiency, filter nodes to keep only those large enough to see.
+  
+  // Calculate the colors for each category
+  var all_categories = getNodeNames(json);
+  for (var name=0; name < all_categories.length; name++) {
+  	color_map[all_categories[name]] = all_colors(name);
+  }
+  
+ // For efficiency, filter nodes to keep only those large enough to see.
   var nodes = partition.nodes(json)
       .filter(function(d) {
       return (d.dx > 0.005); // 0.005 radians = 0.29 degrees
       });
 
-  // Calculate the colors for each category
-  var colored = 0;
-  // the first one is always 'root'
-  for (var n = 0; n < nodes.length; n++) {
-  	for (var nn in nodes[n].children) {
-  		color_map[nodes[n].children[nn].name] = all_colors(colored);
-  		colored++;
-  	}
-  } 
-  
   var path = vis.data([json]).selectAll("path")
       .data(nodes)
       .enter().append("svg:path")
@@ -153,17 +144,18 @@ function createVisualization(json) {
       .attr("fill-rule", "evenodd")
       .style("fill", function(d) { return color_map[d.name]; })
       .style("opacity", 1)
-      .on("mouseover", mouseover);
+      .on("mouseover", mouse_over);
 
   // Add the mouseleave handler to the bounding circle.
-  d3.select("#container").on("mouseleave", mouseleave);
+  d3.select("#container").on("mouseleave", mouse_leave);
+
 
   // Get total size of the tree = value of root node from partition.
   totalSize = path.node().__data__.value;
  };
 
 // Fade all but the current sequence, and show it in the breadcrumb trail.
-function mouseover(d) {
+function mouse_over(d) {
 
   var percentage = (100 * d.value / totalSize).toPrecision(3);
   var percentageString = percentage + "%";
@@ -185,11 +177,11 @@ function mouseover(d) {
   updateBreadcrumbs(sequenceArray, percentageString);
 
   // Fade all the segments.
-  d3.selectAll("path")
+  d3.select("#chart").selectAll("path")
       .style("opacity", 0.4);
 
   // Then highlight only those that are an ancestor of the current segment.
-  vis.selectAll("path")
+  d3.select("#chart").selectAll("path")
       .filter(function(node) {
                 return (sequenceArray.indexOf(node) >= 0);
               })
@@ -197,22 +189,22 @@ function mouseover(d) {
 }
 
 // Restore everything to full opacity when moving off the visualization.
-function mouseleave(d) {
+function mouse_leave(d) {
 
   // Hide the breadcrumb trail
   d3.select("#trail")
       .style("visibility", "hidden");
 
   // Deactivate all segments during transition.
-  d3.selectAll("path").on("mouseover", null);
+  d3.select("#chart").selectAll("path").on("mouseover", null);
 
   // Transition each segment to full opacity and then reactivate it.
-  d3.selectAll("path")
+  d3.select("#chart").selectAll("path")
       .transition()
       .duration(500)
       .style("opacity", 1)
       .each("end", function() {
-              d3.select(this).on("mouseover", mouseover);
+              d3.select(this).on("mouseover", mouse_over);
             });
   
   d3.select("#stats")
@@ -230,6 +222,22 @@ function getAncestors(node) {
     current = current.parent;
   }
   return path;
+  
+}
+
+
+function getNodeNames(tree) {
+	var children = tree.children;
+    var children_names = [];
+    
+	if (!children) {return [];}
+	
+	for (var i=0; i < children.length; i++) {
+		var front = children[i];
+		children_names.push(front.name);
+		children_names = children_names.concat(getNodeNames(front));
+	}
+	return children_names;
 }
 
 
@@ -366,7 +374,7 @@ function computeScaling(el) {
    
    xy_scale = Math.min(x_scale, y_scale);
    var tolerance = 0.1;
-   console.log(xy_scale);   
+   
    if (xy_scale < 1) {return 0.9*xy_scale;} // fix this, see TODO
    else if (xy_scale - tolerance > 1) {return xy_scale - tolerance;}
    else return 1.0;

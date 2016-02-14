@@ -6,11 +6,12 @@
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
         <style type='text/css'>
         	#map { height: 85vh; 
-        		   width:50vw;
+        		   width:47vw;
         		   float:left;
         		 }
         		
         	.leaflet-container {
+        		background-color:rgba(0,0,0,0);
         	}
         	.province-label {
             	font-size: 1.2em;
@@ -19,18 +20,18 @@
         	}
         	#d3plot {
         		height: 85vh; 
-        		width:45vw;
+        		width:50vw;
         		overflow:hidden;
         	}
         	#job_breakdown {
-        		width:90%;
-        		height:10%;
+        		width:100%;
+        		height:5%;
         		overflow:hidden;
         	}
         	#chart {
         		position: relative;
 				width: 100%;
-				height: 90%;
+				height: 95%;
 				overflow:hidden;
 			}
 			#d3_svg_container {
@@ -39,19 +40,30 @@
 				overflow: hidden;	
 			}
 			#stats {
+				  width: 10vw;
 				  margin: auto;  
 				  position: relative;
-  				  left:45%;
+  				  left:0%;
   				  right: 0;
   				  top: 50%;
   				  bottom: 0;
     			  color: #666;
-				  z-index:-1;
+			}
+			#trail {
+				width: 100%;
+				height: 100%;
+			}
+			#location {
+				visibility: visible;
+				
+			}
+			#location, #percentage, #number {
+				margin-left: 15%;
 			}
 			#percentage {
 				font-size: 2em;
 			}
-			#number {
+			#number, #location {
 				font-size: 1.3em;			
 			}
 			#container {
@@ -78,7 +90,9 @@
         	<!-- -->
         	<div id="chart">
         		<div id="stats" style="visibility: hidden;">
-          			<span id="percentage">" "</span><br/><span id="number">" "</span>
+        			<span id="location">България</span><br/>
+          			<span id="percentage">" "</span><br/>
+          			<span id="number">" "</span>
         		</div>        		
         	</div>
         	<!-- -->       	
@@ -86,7 +100,7 @@
         
         <script src="/server/d3plot.js"></script>
         <script type="text/javascript">
-        	displayD3("../all.csv");
+        	displayD3("/server/data/csv/all.csv");
         </script>
         
     </body>

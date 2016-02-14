@@ -10,7 +10,7 @@ var map = L.map('map', {
 			forceSeparateButton:true
 		},
 		dragging:true,
-		touchZoom:false,
+		touchZoom:true,
 		doubleClickZoom:false,
 		boxZoom:false,
 		bounceAtZoomLimits:false,
@@ -20,22 +20,62 @@ var map = L.map('map', {
 		zoom:7.5
 	});
 
+/*set up special controls
+ *  
+ * Code adapted from http://opendata.yurukov.net/educ/map/
+ * 
+ * */
+
+L.Control.DataSwitch = L.Control.extend({
+	options: {
+		collapsed: true,
+		position: 'topright',
+		autoZIndex: true
+	},
+
+	initialize: function (dataValTypes, options) {
+		L.setOptions(this, options);
+
+		this._types = dataValTypes;
+		this._active = options.default;
+	},
+
+	onAdd: function (map) {
+	 	console.log(this);
+	}
+});
+
+/* add the controls
+ */
+
+/*
+map.addControl(new L.Control.DataSwitch([
+	{"title":"Show stats for whole country",
+		src:"/educ/map/res/img/con_kin.png",type:1},
+	{"title":"Mouse clicks show stats for provinces",
+		src:"/educ/map/res/img/con_sch.png",type:2},
+	{"title":"Mouse clicks show stats for municipalities",
+		src:"/educ/map/res/img/con_kinperc.png",type:3}],
+	{"default":4}));
+
+*/
+
 /*set up the feature styles*/
 var featureLayer = new L.GeoJSON();
 var municipality_DefaultStyle = {
             color: "#2262CC",
             weight: 1,
             opacity: 0.6,
-            fillOpacity: 0.1,
-            fillColor: "#2262CC"
+            fillOpacity: 0.4,
+            fillColor: "#ffffff" //"#2262CC"
 };
 
 var province_DefaultStyle = {
             color: "#2262CC",
             weight: 3,
             opacity: 0.6,
-            fillOpacity: 0.1,
-            fillColor: "#2262CC"
+            fillOpacity: 1,
+            fillColor: "#ffffff"
 };
 
 var province_BoldStyle = { // highlight the feature
@@ -86,6 +126,37 @@ function mouseoverMunicipality(e) {
     }    
 }
 
+
+function mouseclickMunicipality(e) {
+	var layer = e.target;       
+	console.log('mouseclick'); 
+	/*
+	 * Since each municipality feature stores the _leaflet_id of
+	 * its parent layer (province), we can get a handle to the parent
+	 * via L.layerGroup.getLayer() API.
+	 * We highlight the parent layer only if it is not currently highlighted. 
+	 * After highlighting we update the highlightedProvinceLayer with the _leaflet_id 
+	 * of the said parent	
+	 */
+	
+    var parentLayerID = layer.feature.properties.parentProvinceLayer;
+    if (parentLayerID) {
+    	var parentLayer = featureProvincesLayer.getLayer(parentLayerID);
+    	var provinceName = parentLayer.feature.properties.name;
+    	var provinceNUTS3 = parentLayer.feature.properties.nuts3;
+    	
+    	var location = document.getElementById("location");
+    	location.textContent = provinceName;
+    	
+    	console.log(location);
+    	var fileName = provinceNUTS3 + ".csv"; 
+    	// console.log(fileName);
+    	displayD3("/server/data/csv/" + fileName);
+    }
+    
+     
+}
+
 function mouseoutMunicipality(e) {
 	console.log('mouseout');
 	var layer = e.target; 
@@ -99,7 +170,7 @@ var onEachProvinceFeature = function(feature, layer) {
     //add text labels at the center of each feature
     var labelName = feature.properties.name;
     var iconsize = [50,10];
-    console.log(feature.properties.name+";"+feature.properties.nuts3);
+    
     /* Manual hack to shift the SFO province more to the right */
 	if (feature.properties.nuts3 == 'SFO') {
        	iconsize = [0,10];
@@ -113,7 +184,7 @@ var onEachProvinceFeature = function(feature, layer) {
        	keyboard:false,
        	zIndexOffset:-1000
         });
-    label.addTo(map);
+    //label.addTo(map);
 };
 
 var onEachMunicipalityFeature = function(feature, layer) {
@@ -126,10 +197,9 @@ var onEachMunicipalityFeature = function(feature, layer) {
 	}	
 	
     layer.on({
-        //mouseover: highlightFeature,
         mouseover: mouseoverMunicipality,
         mouseout: mouseoutMunicipality,
-        //click: zoomToFeature,
+        click: mouseclickMunicipality,
         //pointToLayer: pointToLayer
     });
 
