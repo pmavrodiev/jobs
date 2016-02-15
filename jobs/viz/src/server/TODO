@@ -1,0 +1,13 @@
+Small glitch with scaling of the svg container. 
+The computed scaling factor is slighly underestimated and as a result the svg graph overflows when window is downsized.
+This has to to with the radius of the underlying circle. 
+So far manual hack in computeScaling
+  
+The inner-most 4 arcs corresponding to the 4 main economic categorizations
+should have fixed partitioning and not based on relative size. This is to 
+ensure that their visual location remains constant when changing municipalities.
+
+Glitch with rescaling the d3 plot in Firefox.  
+<svg> container has width(height).animVal.value  equal to 1, which produces
+a very small scaling factor and the plot disappears.
+ 
