@@ -70,6 +70,7 @@ function displayD3(filename) {
   				var json = buildHierarchy(csv);
  			 	createVisualization(json);
 	});
+	d3plot_filename = filename;
 }
 
 // Take a 2-column CSV and transform it into a hierarchical structure suitable
