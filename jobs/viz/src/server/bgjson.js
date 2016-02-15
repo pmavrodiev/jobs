@@ -70,8 +70,7 @@ function mouseoverMunicipality(e) {
 
 
 function mouseclickMunicipality(e) {
-	var layer = e.target;       
-	console.log('mouseclick'); 
+	var layer = e.target;
 	/*
 	 * Since each municipality feature stores the _leaflet_id of
 	 * its parent layer (province), we can get a handle to the parent
@@ -80,38 +79,23 @@ function mouseclickMunicipality(e) {
 	 * After highlighting we update the highlightedProvinceLayer with the _leaflet_id 
 	 * of the said parent	
 	 */
-	
-    var parentLayerID = layer.feature.properties.parentProvinceLayer;
-    if (parentLayerID) {
-    	var parentLayer = featureProvincesLayer.getLayer(parentLayerID);
-    	var provinceName = parentLayer.feature.properties.name;
-    	var provinceNUTS3 = parentLayer.feature.properties.nuts3;
-    	var municipalityNUTS4 = layer.feature.properties.nuts4;
-    	var municipalityName = layer.feature.properties.name;
+	if (d3plot_granularity == MUNICIPALITY) {
+    	var parentLayerID = layer.feature.properties.parentProvinceLayer;
+    	if (parentLayerID) {
+    		var parentLayer = featureProvincesLayer.getLayer(parentLayerID);
+    		var provinceName = parentLayer.feature.properties.name;
+    		var provinceNUTS3 = parentLayer.feature.properties.nuts3;
+    		var municipalityNUTS4 = layer.feature.properties.nuts4;
+    		var municipalityName = layer.feature.properties.name;
     	
-    	var location = document.getElementById("location");
-    	console.log(d3plot_granularity);
-    	
-    	if ( d3plot_granularity == COUNTRY || 
-    	     d3plot_granularity == PROVINCE ) {
-    	
-    		location.textContent = provinceName;
-			var fileName = provinceNUTS3 + ".csv"; 
-    		// console.log(fileName);
-    		displayD3("/server/data/csv/" + fileName);
-    	
-    	     	
-    	}
-    	else if (d3plot_granularity == MUNICIPALITY) {
+    		var location = document.getElementById("location");
     		location.textContent = municipalityName;
     		var fileName = provinceNUTS3 + "." + municipalityNUTS4 + ".csv"; 
-    		// console.log(fileName);
-    		displayD3("/server/data/csv/" + fileName);
+   			displayD3("/server/data/csv/" + fileName);
+    	     	
     	}
-    }
-    
-     
-}
+    }   
+};
 
 function mouseoutMunicipality(e) {
 	var layer = e.target;
@@ -143,7 +127,15 @@ function mouseoutProvince(e) {
 };
 
 function mouseclickProvince(e) {
-	
+	if (d3plot_granularity == PROVINCE || d3plot_granularity == COUNTRY) {
+    	var provinceName = this.feature.properties.name;
+    	var provinceNUTS3 = this.feature.properties.nuts3;
+
+    	var location = document.getElementById("location");
+    	location.textContent = provinceName;
+    	var fileName = provinceNUTS3 + ".csv"; 
+   		displayD3("/server/data/csv/" + fileName);	     	
+    }
 };
 /*style each feature*/
 
