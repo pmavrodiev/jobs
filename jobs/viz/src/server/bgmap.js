@@ -134,22 +134,21 @@ function mouseclickProvince(e) {
     	var location = document.getElementById("location");
     	location.textContent = provinceName;
     	var fileName = provinceNUTS3 + ".csv"; 
-   		displayD3("/server/data/csv/" + fileName);	     	
+   		displayD3("/server/data/csv/" + fileName);
+   		flipEnabled(PROVINCE);
     }
 };
-/*style each feature*/
 
+/*style each feature*/
 var onEachProvinceFeature = function(feature, layer) {
 	layer.setStyle(province_DefaultStyle);
     //add text labels at the center of each feature
     var labelName = feature.properties.name;
-    var iconsize = [50,10];
-    
+    var iconsize = [50,10];    
     /* Manual hack to shift the SFO province more to the right */
 	if (feature.properties.nuts3 == 'SFO') {
        	iconsize = [0,10];
-    }
-    
+    }    
     feature.properties.is_highlighted = false;
     
     layer.on({
@@ -158,7 +157,6 @@ var onEachProvinceFeature = function(feature, layer) {
         click: mouseclickProvince,
         //pointToLayer: pointToLayer
     });
-
     
     var label = L.marker(layer.getBounds().getCenter(), {        	
     	icon: L.divIcon({
@@ -196,6 +194,7 @@ var onEachMunicipalityFeature = function(feature, layer) {
     layer.setStyle(municipality_DefaultStyle);
   
     //add text labels at the center of each feature
+    /*
     var labelName = feature.properties.name;
     var label = L.marker(layer.getBounds().getCenter(), {        	
     	icon: L.divIcon({
@@ -204,6 +203,7 @@ var onEachMunicipalityFeature = function(feature, layer) {
        		iconSize: [0, 0]})
        });
     //label.addTo(map);  
+	*/
 };
 
 var featureProvincesLayer = L.geoJson(bgprovinces, {
@@ -233,19 +233,14 @@ var d3plot_filename = ""; // curently displayed region
 // just a helper function
 function flipEnabled(type) {
 		
-	var switch_1 = document.getElementById("switch_1");
-	var switch_2 = document.getElementById("switch_2");
-	var switch_3 = document.getElementById("switch_3");
-	
-	switch_1.is_active=false;
-	switch_2.is_active=false;
-	switch_3.is_active=false;
-	switch_1.style.opacity = INACTIVE;
-	switch_2.style.opacity = INACTIVE;
-	switch_3.style.opacity = INACTIVE;
-	
-	var switch_arr = {1: switch_1, 2: switch_2, 3: switch_3};
-	
+	var switch_arr = [document.getElementById("switch_" + COUNTRY),
+	                  document.getElementById("switch_" + PROVINCE),
+	                  document.getElementById("switch_" + MUNICIPALITY)
+	                 ];
+	for (var i=0; i < switch_arr.length; i++) {
+		switch_arr[i].is_active=false;
+		switch_arr[i].style.opacity = INACTIVE;
+	}
 	switch_arr[type].is_active=true;
 	switch_arr[type].style.opacity = ACTIVE;
 }
@@ -276,7 +271,7 @@ L.Control.DataSwitch = L.Control.extend({
 			switchDiv.addEventListener("click", function(e){
 				// e.target is the <img> element
 				parentDiv = e.target.parentNode;
-    	        if (e.target.data.type == 1 && !parentDiv.is_active) {
+    	        if (e.target.data.type == COUNTRY && !parentDiv.is_active) {
     	        	if (d3plot_filename != "/server/data/csv/all.csv") {
     	        		displayD3("/server/data/csv/all.csv");
 						var location = document.getElementById("location");
@@ -290,11 +285,11 @@ L.Control.DataSwitch = L.Control.extend({
     			    featureMunicipalitiesLayer.bringToBack();
 					return;
     	        }
-    	        else if (e.target.data.type == 2) {
+    	        else if (e.target.data.type == PROVINCE) {
     	        	d3plot_granularity = PROVINCE;
     	        	featureProvincesLayer.bringToFront();
     	        }
-    	        else if (e.target.data.type == 3) {
+    	        else if (e.target.data.type == MUNICIPALITY) {
     	        	d3plot_granularity = MUNICIPALITY;
     	        	featureMunicipalitiesLayer.bringToFront();
     	        }
@@ -337,11 +332,11 @@ L.Control.DataSwitch = L.Control.extend({
 
 map.addControl(new L.Control.DataSwitch([
 	{"title":"Show statistics for whole country",
-	  					src:'server/res/img/whole_country.png',type:1, is_active:true},
+	  					src:'server/res/img/whole_country.png',type: COUNTRY, is_active:true},
 	{"title":"Show statistics for provinces",
-	  					src:"/server/res/img/provinces.png",type:2, is_active:false},
+	  					src:"/server/res/img/provinces.png",type:PROVINCE, is_active:false},
 	{"title":"Show statistics for municipalities",
-	  					src:"server/res/img/municipalities.png",type:3, is_active:false}],
+	  					src:"server/res/img/municipalities.png",type: MUNICIPALITY, is_active:false}],
 	{"default":4}));
 
 
