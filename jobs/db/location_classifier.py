@@ -67,7 +67,12 @@ from sets import Set
 import csv
 import re
 import logging
-logger = logging.getLogger('root')
+import os
+import sys
+
+sys.path.insert(1, os.path.join(sys.path[0], '../simple_logging'))
+
+from custom_logging import setup_custom_logger
 
 # compile a regex that removes all white spaces from a string,
 # including the annoying \xa0 (non-breaking space in Latin1 ISO 8859-1)
@@ -77,10 +82,8 @@ nowhitespaces = re.compile(r"[\xa0\s+]")
 class LocationClassifier:
 
     # set up the logger
-    LOGGING_LEVEL = logging.ERROR
-    logging.basicConfig(level=LOGGING_LEVEL)
-    logger = logging.getLogger(__name__)
-    logger.setLevel(LOGGING_LEVEL)
+    LOGGING_LEVEL = logging.WARNING
+    logger = setup_custom_logger('LocationClassifier', LOGGING_LEVEL)
 
     def __init__(self, ekatte_file, provinces_file):
         self.f_ekatte = ekatte_file
@@ -128,7 +131,7 @@ class LocationClassifier:
         try:
             ekatte_file = open(self.f_ekatte, 'r')
         except IOError as e:
-            logger.error("%s", e)
+            LocationClassifier.logger.error("%s", e)
             return (None, None)
         ekatte_csv = csv.reader(ekatte_file, delimiter=',')
         ekatte_csv.next()   # skip the header
@@ -170,7 +173,7 @@ class LocationClassifier:
         try:
             province_file = open(self.f_provinces, 'r')
         except IOError as e:
-            logger.error("%s", e)
+            LocationClassifier.logger.error("%s", e)
             return (None, None)
 
         province_csv = csv.reader(province_file, delimiter=';')
@@ -222,7 +225,7 @@ class LocationClassifier:
         location = kwargs.pop("location", None)
         location2 = kwargs.pop("location2", None)
         if not (job_posting_url and location and location2):
-            logger.error("Inadequate kwargs")
+            LocationClassifier.logger.error("Inadequate kwargs")
             return return_codes
         # for some reason some entries for Обзор have a 'O'
         # instead of the unicode code for the cyrrilic 'O' u'\u041e'
@@ -261,8 +264,9 @@ class LocationClassifier:
             set_type_dict = self.ekatte_dict[ekatte_loc]
             # sanity check, len(found)= 1 =len(settlement_type_dict.keys())
             if len(set_type_dict.keys()) != 1:
-                logger.error(("Inconsistent settlement types "
-                              "for settlement %s"), ekatte_loc)
+                LocationClassifier.logger.error(("Inconsistent settlement "
+                                                 "types for settlement %s"),
+                                                ekatte_loc)
                 return return_codes
             #
             nuts3 = set_type_dict[set_type_dict.keys()[0]][0][0]
@@ -271,10 +275,13 @@ class LocationClassifier:
             if location2_resolved:
                 nuts3_sqlite = self.provinces_dict[location2_cleaned]
                 if (nuts3_sqlite != nuts3):
-                    logger.debug(("location2 nuts3 %s does not "
-                                  "match EKATTE nuts3 %s for job %s. "
-                                  "Preferring EKATTE nuts3"),
-                                 nuts3_sqlite, nuts3, job_posting_url)
+                    LocationClassifier.logger.debug(("location2 nuts3 %s "
+                                                     "does not match EKATTE "
+                                                     "nuts3 %s for job %s. "
+                                                    "Preferring EKATTE nuts3"),
+                                                    nuts3_sqlite,
+                                                    nuts3,
+                                                    job_posting_url)
                 # nuts3=nuts3_sqlite
 
             # add the job posting in its corresponding georgaphical 'bucket'
@@ -287,9 +294,11 @@ class LocationClassifier:
                 nuts3 = self.provinces_dict[location2_cleaned]
                 return_codes = (nuts3, UNNAMED)
             else:
-                logger.info(("Cannot find location %s and resolve "
-                             "location %s for job %s"),
-                            location, location2, job_posting_url)
+                LocationClassifier.logger.info(("Cannot find location %s and "
+                                                "resolve location %s for "
+                                                "job %s"),
+                                               location, location2,
+                                               job_posting_url)
 
         # multiple matches exist in the EKATTE data for
         # the settlement in 'location'
@@ -341,9 +350,9 @@ class LocationClassifier:
                     if CITY in settlmnt_type_dict:
                         nuts_codes = settlmnt_type_dict[CITY]
                         if len(nuts_codes) > 1:
-                            logger.info(("More than 1 cities exist for "
-                                         "location %s. Without location2 "
-                                         "cannot resolve for job %s"),
+                            LocationClassifier.logger.info(("More than 1 "
+                            "cities exist for location %s. Without location2 "
+                            "cannot resolve for job %s"),
                                         location, job_posting_url)
                         else:
                             nuts3 = nuts_codes[0][0]
@@ -351,18 +360,18 @@ class LocationClassifier:
                             return_codes = (nuts3, nuts4)
                     # no cities exist with the name 'location'
                     else:
-                        logger.info(("Cannot resolve location %s to a "
+                        LocationClassifier.logger.info(("Cannot resolve location %s to a "
                                      "main city in the absense of "
                                      "location2 for job %s"),
                                     location, job_posting_url)
                 # giving up on this job, nothing can be done
                 else:
-                    self. logger.info(("location2 (%s) and location (%s) "
+                    LocationClassifier.logger.info(("location2 (%s) and location (%s) "
                                        " cannot be resolved for job %s. "
                                        "Giving up."),
                                       location2, location, job_posting_url)
         # end if len(found) == 1
-        logger.debug("%s / %s categorized as %s / %s for job %s",
+        LocationClassifier.logger.debug("%s / %s categorized as %s / %s for job %s",
                      location, location2,
                      return_codes[0], return_codes[1], job_posting_url)
         return return_codes

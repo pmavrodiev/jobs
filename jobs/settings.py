@@ -66,10 +66,10 @@ DOWNLOADER_MIDDLEWARES = {
         'jobs.comm.rotate_useragent.RotateUserAgentMiddleware' :400
 }
 
-LOG_FILE = "jobs/logs/main.log"
-LOG_ENABLED = True
+# LOG_FILE = "jobs/logs/main.log"
+LOG_ENABLED = False
 #
-ROOT_LOG_DIR = "jobs/logs/"
+# ROOT_LOG_DIR = "jobs/logs/"
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
 #EXTENSIONS = {
@@ -79,14 +79,11 @@ ROOT_LOG_DIR = "jobs/logs/"
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'jobs.pipelines.duplicates_pipeline.DuplicatesPipeline': 100,
-   'jobs.pipelines.preparedata_pipeline.PrepareDataPipeline': 200,
-   'jobs.pipelines.sqlitewriter_pipeline.SqliteWriterPipeline': 300
+   'jobs.scrapy_pipelines.duplicates_pipeline.DuplicatesPipeline': 100,
+   'jobs.scrapy_pipelines.preparedata_pipeline.PrepareDataPipeline': 200,
+   'jobs.scrapy_pipelines.sqlitewriter_pipeline.SqliteWriterPipeline': 300
 }
 
-#The SQLite database to which the data is to be written
-# *without* extension
-SQLITEDB = 'jobs/crawled/data'
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html

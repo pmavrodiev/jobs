@@ -9,13 +9,17 @@ Created on Thu Feb 11 14:08:25 2016
 from basic_tree import Tree
 from basic_tree import _ROOT
 from basic_tree import sanitize_id
+from custom_logging import setup_custom_logger
 
 import csv
 import logging
-logger = logging.getLogger('root')
+# logger = logging.getLogger('root')
 
 
 class TreeParser(Tree):
+
+    LOGGING_LEVEL = logging.WARNING
+    logger = setup_custom_logger('TreeParser', LOGGING_LEVEL)
 
     def __init__(self, fname, cache_file=None):
         super(TreeParser, self).__init__()
@@ -54,8 +58,8 @@ class TreeParser(Tree):
                     _sum = _sum + self[node_identifier].data[nuts3][nuts4]
         else:
             # not nuts3 and nuts4
-            logger.error("Cannot request nuts4 without specifying "
-                              "nuts3 ")
+            TreeParser.logger.error("Cannot request nuts4 without specifying "
+                                    "nuts3 ")
             return None
         #
         return _sum
@@ -100,7 +104,7 @@ class TreeParser(Tree):
             in_tree = open(self.filename, 'r')
             return csv.reader(in_tree, delimiter=";")
         except IOError as e:
-            logger.error("%s", e)
+            TreeParser.logger.error("%s", e)
             return None
 
     def get_most_similar(self, node_identifier):
@@ -126,6 +130,8 @@ class TreeParser(Tree):
             main_name = main_name.encode('utf-8')
         if type(alt_name) == unicode:
             alt_name = alt_name.encode('utf-8')
+
+        TreeParser.logger.debug("Tokenized %s -> %s", main_name, alt_name)
         return (main_name, alt_name)
 
     def build_tree(self):

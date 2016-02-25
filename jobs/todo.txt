@@ -1,2 +1,5 @@
+- complete luigi set-up
+
 - email functionality
+
 - visualization 

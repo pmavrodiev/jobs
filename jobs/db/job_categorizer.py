@@ -13,12 +13,13 @@ from sqlitereader import SqliteReader
 from tree_parser import TreeParser
 from basic_tree import sanitize_id
 from location_classifier import nowhitespaces
+from custom_logging import setup_custom_logger
 
 import logging
 import sqlite3 as sqlite
 import re
 import os
-import log
+
 
 # a regex to split a string on the many hyphens in existence
 hyphens = (u"\u002D", u"\u058A", u"\u05BE", u"\u1400", u"\u1806",
@@ -31,6 +32,10 @@ nohyphens = re.compile(regexPattern)
 
 
 class JobCategorizer(object):
+
+    # set up the logger
+    LOGGING_LEVEL = logging.WARNING
+    logger = setup_custom_logger('JobCategorizer', LOGGING_LEVEL)
 
     # takes initialized instances
     def __init__(self, location_classifier, tree_parser, sqlite_reader):
@@ -48,7 +53,7 @@ class JobCategorizer(object):
     def populate_tree(self):
         if not (self.lc.ekatte_dict and lc.ekatte_locations and
                 tp.initialized):
-            logger.error(("Something went wrong with the initialization. "
+            JobCategorizer.logger.error(("Something went wrong with the initialization. "
                           "Investigate"))
             return False
 
@@ -58,9 +63,9 @@ class JobCategorizer(object):
         db_url = 1
         db_location = 5
         db_location2 = 6
-        all_jobs = self.sqlite_reader.runQuery("SELECT * from bgjobs")
+        all_jobs = self.sqlite_reader.runQuery("SELECT * from bgjobs limit 10")
         if type(all_jobs) == sqlite.ProgrammingError:
-            logger.error(all_jobs.message)
+            JobCategorizer.logger.error(all_jobs.message)
             return False
 
         for row in all_jobs:
@@ -74,7 +79,7 @@ class JobCategorizer(object):
             # find the category(ies) for this job
             job_categories = self.get_categories(row[db_url])
             if len(job_categories) == 0:  # []
-                logger.warning("Categories not parsed for job %s", row[db_url])
+                JobCategorizer.logger.warning("Categories not parsed for job %s", row[db_url])
                 continue
             #
             # job_categories = ["банкикредитиране"]
@@ -91,7 +96,7 @@ class JobCategorizer(object):
                     else:
                         self.tp[cat].data[nuts3] = dict({nuts4:
                                                          category_weight})
-        # TODO: pickle self.tp to a file now for faster access
+        # TODO: serialize self.tp for faster access
         sqlite_reader.close_db()
         return True
 
@@ -116,11 +121,11 @@ class JobCategorizer(object):
                 if most_similar:
                     # good, category is resolved
                     categories_list.append(most_similar)
-                    logger.debug("Category %s fully resolved for job %s",
+                    JobCategorizer.logger.debug("Category %s fully resolved for job %s",
                                  cat, job_url)
                 else:
                     # leaf not found, likely misspecified category config.
-                    logger.warning(("Mismatch in hierarchical structures "
+                    JobCategorizer.logger.warning(("Mismatch in hierarchical structures "
                                     "between database and category file "
                                     "for category %s, job %s"), cat, job_url)
             elif len(cat_splitted) == 1:
@@ -130,16 +135,16 @@ class JobCategorizer(object):
                 if most_similar in self.tp:
                     # found it, we are done
                     categories_list.append(most_similar)
-                    logger.debug(("Category %s fully resolved for "
+                    JobCategorizer.logger.debug(("Category %s fully resolved for "
                                   "job %s"), cat, job_url)
                 else:
                     # not found, likely misspecified category config.
-                    logger.warning(("Mismatch in hierarchical structures "
+                    JobCategorizer.logger.warning(("Mismatch in hierarchical structures "
                                     "between database and category file "
                                     "for category %s, job %s"), cat, job_url)
             else:
                 # should never happen
-                logger.error("Impossible category %s. Investigate.", cat)
+                JobCategorizer.logger.error("Impossible category %s. Investigate.", cat)
         # end for row in all_categories
         return categories_list
 
@@ -151,7 +156,7 @@ class JobCategorizer(object):
         output_dir = kwargs.pop("outdir", "")
 
         if not nuts3 and nuts4:
-            logger.error("Cannot request nuts4 without specifying nuts3 ")
+            JobCategorizer.logger.error("Cannot request nuts4 without specifying nuts3 ")
             return
 
         filename = "all.csv"
@@ -162,7 +167,7 @@ class JobCategorizer(object):
         try:
             out = open(filename, 'w')
         except IOError as e:
-            logger.error("%s", e)
+            JobCategorizer.logger.error("%s", e)
             return
 
         for leaf in self.tp.get_leaves():
@@ -174,9 +179,6 @@ class JobCategorizer(object):
 
 
 if __name__ == "__main__":
-    # set up the logger
-    LOGGING_LEVEL = logging.WARNING
-    logger = log.setup_custom_logger('root', LOGGING_LEVEL)
 
     sqlite_reader = SqliteReader("../crawled/data-2016-2-6_21-50-52.sqlite")
     lc = LocationClassifier("Ek_atte.csv", "provinces.csv")

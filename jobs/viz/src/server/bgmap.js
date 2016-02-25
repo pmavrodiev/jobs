@@ -1,6 +1,9 @@
 //Map centering taken from http://opendata.yurukov.net/educ/map/
 /*set up the map*/
-var map = L.map('map', {
+
+L.mapbox.accessToken = 'pk.eyJ1IjoicG1hdnJvZGlldiIsImEiOiJjaWs5aDFhNzQwMDBldnRseXpzMnZwZGkwIn0.wY9stSDSqinhtKisD0MxJw';
+
+var map = L.maxbox.map('map','maxbox.streets', {
 		maxBounds:new L.LatLngBounds(new L.LatLng(40.2711, 20.4565),new L.LatLng(45.1123, 30.3442)),
 		minZoom:7,
 		maxZoom:11,
@@ -20,6 +23,11 @@ var map = L.map('map', {
 		zoom:7.1
 	});
 
+
+L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	maxZoom: 19,
+	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
 
 /*set up the feature styles*/
 var featureLayer = new L.GeoJSON();
@@ -91,7 +99,7 @@ function mouseclickMunicipality(e) {
     		var location = document.getElementById("location");
     		location.textContent = municipalityName;
     		var fileName = provinceNUTS3 + "." + municipalityNUTS4 + ".csv"; 
-   			displayD3("/server/data/csv/" + fileName);
+   			displayD3("server/data/csv/" + fileName);
     	     	
     	}
     }   
@@ -134,7 +142,7 @@ function mouseclickProvince(e) {
     	var location = document.getElementById("location");
     	location.textContent = provinceName;
     	var fileName = provinceNUTS3 + ".csv"; 
-   		displayD3("/server/data/csv/" + fileName);
+   		displayD3("server/data/csv/" + fileName);
    		flipEnabled(PROVINCE);
     }
 };
@@ -272,8 +280,8 @@ L.Control.DataSwitch = L.Control.extend({
 				// e.target is the <img> element
 				parentDiv = e.target.parentNode;
     	        if (e.target.data.type == COUNTRY && !parentDiv.is_active) {
-    	        	if (d3plot_filename != "/server/data/csv/all.csv") {
-    	        		displayD3("/server/data/csv/all.csv");
+    	        	if (d3plot_filename != "server/data/csv/all.csv") {
+    	        		displayD3("server/data/csv/all.csv");
 						var location = document.getElementById("location");
     		        	location.textContent = "България";
     		        }
@@ -334,7 +342,7 @@ map.addControl(new L.Control.DataSwitch([
 	{"title":"Show statistics for whole country",
 	  					src:'server/res/img/whole_country.png',type: COUNTRY, is_active:true},
 	{"title":"Show statistics for provinces",
-	  					src:"/server/res/img/provinces.png",type:PROVINCE, is_active:false},
+	  					src:"server/res/img/provinces.png",type:PROVINCE, is_active:false},
 	{"title":"Show statistics for municipalities",
 	  					src:"server/res/img/municipalities.png",type: MUNICIPALITY, is_active:false}],
 	{"default":4}));
