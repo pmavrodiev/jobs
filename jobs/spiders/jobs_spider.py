@@ -251,9 +251,4 @@ class JobsSpider(spiders.Spider):
         yield item
 
 
-if __name__ == "__main__":
-
-    process = CrawlerProcess(get_project_settings())
-    process.crawl("jobsSpider")
-    process.start()
 
