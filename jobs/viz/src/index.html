@@ -1,124 +1,141 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <link href='http://fonts.googleapis.com/css?family=Open+Sans', rel='stylesheet', type='text/css'>
-        <style type='text/css'>
-        	#map { height: 85vh; 
-        		   width:47vw;
-        		   float:left;
-        		 }
-        		
-        	.leaflet-container {
-        		
-        	}
-        	.province-label {
-            	font-size: 1.2em;
-            	font-weight: 300;
-            /* Use color, background, set margins for offset, etc */
-        	}
-        	#d3plot {
-        		height: 85vh; 
-        		width:50vw;
-        		overflow:hidden;
-        	}
-        	#job_breakdown {
-        		width:100%;
-        		height:5%;
-        		overflow:hidden;
-        	}
-        	#chart {
-        		position: relative;
-				width: 100%;
-				height: 95%;
-				overflow:hidden;
-			}
-			#d3_svg_container {
-				width:100%;
-				height:90%;
-				overflow: hidden;	
-			}
-			#stats {
-				  width: 10vw;
-				  margin: auto;  
-				  position: relative;
-  				  left:0%;
-  				  right: 0;
-  				  top: 50%;
-  				  bottom: 0;
-    			  color: #666;
-			}
-			#trail {
-				width: 100%;
-				height: 100%;
-			}
-			#location {
-				visibility: visible;
-				
-			}
-			#location, #percentage, #number {
-				margin-left: 15%;
-			}
-			#percentage {
-				font-size: 2em;
-			}
-			#number, #location {
-				font-size: 1.3em;			
-			}
-			#container {
-				width:100%;
-				height: 100%;
-				overflow: hidden;
-			}
-			.dataswitch {
-				cursor: pointer;
-				background: none;
-				width: 50px;
-				height: 50px;
-				margin-right: 10px;
-				float:left;	
-			}
-			.dataswitch:hover {
-				opacity:0.7;
-			}			
-        </style>
-        
-        <!--
-        <script src="server/lib/leaflet/leaflet-src.js"></script>     
-        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
-        -->
-        <script src='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.js'></script>
-		<link href='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.css' rel='stylesheet' /> 
-  
-        <title>Jobs Viz</title>
-    </head>
-    <body>
-        <h1>Industrial demand in Bulgaria</h1>
-        <!-- add the leaflet map-->
-        <div id="map"></div>
-        <script src="server/data/provinces_names.geojson"></script>
-        <script src="server/data/municipalities_names.geojson"></script>
-        <script src="server/bgmap.js"></script>
-        <!-- add d3.js -->
-        <script src="server/lib/d3js/d3.js"></script>
-        <div id="d3plot">
-        	<div id="job_breakdown"></div>
-        	<!-- -->
-        	<div id="chart">
-        		<div id="stats" style="visibility: hidden;">
-        			<span id="location">България</span><br/>
-          			<span id="percentage">" "</span><br/>
-          			<span id="number">" "</span>
-        		</div>        		
-        	</div>
-        	<!-- -->       	
-        </div>
-        
-        <script src="server/d3plot.js"></script>
-        <script type="text/javascript">
-        	displayD3("server/data/csv/all.csv");
-        </script>
-        
-    </body>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' , rel='stylesheet' , type='text/css'>
+	<style type='text/css'>
+		#map {
+			height: 85vh;
+			width: 47vw;
+			float: left;
+		}
+
+		.leaflet-container {}
+
+		.province-label {
+			font-size: 1.2em;
+			font-weight: 300;
+			/* Use color, background, set margins for offset, etc */
+		}
+
+		#d3plot {
+			height: 85vh;
+			width: 50vw;
+			overflow: hidden;
+		}
+
+		#job_breakdown {
+			width: 100%;
+			height: 5%;
+			overflow: hidden;
+		}
+
+		#chart {
+			position: relative;
+			width: 100%;
+			height: 95%;
+			overflow: hidden;
+		}
+
+		#d3_svg_container {
+			width: 100%;
+			height: 90%;
+			overflow: hidden;
+		}
+
+		#stats {
+			width: 10vw;
+			margin: auto;
+			position: relative;
+			left: 0%;
+			right: 0;
+			top: 50%;
+			bottom: 0;
+			color: #666;
+		}
+
+		#trail {
+			width: 100%;
+			height: 100%;
+		}
+
+		#location {
+			visibility: visible;
+
+		}
+
+		#location,
+		#percentage,
+		#number {
+			margin-left: 15%;
+		}
+
+		#percentage {
+			font-size: 2em;
+		}
+
+		#number,
+		#location {
+			font-size: 1.3em;
+		}
+
+		#container {
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		}
+
+		.dataswitch {
+			cursor: pointer;
+			background: none;
+			width: 50px;
+			height: 50px;
+			margin-right: 10px;
+			float: left;
+		}
+
+		.dataswitch:hover {
+			opacity: 0.7;
+		}
+	</style>
+
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+		integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+		integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+	<title>Jobs Viz</title>
+</head>
+
+<body>
+	<h1>Industrial demand in Bulgaria</h1>
+	<!-- add the leaflet map-->
+	<div id="map"></div>
+	<script src="server/data/provinces_names.geojson"></script>
+	<script src="server/data/municipalities_names.geojson"></script>
+	<script src="server/bgmap.js"></script>
+	<!-- add d3.js -->
+	<script src="server/lib/d3js/d3.js"></script>
+	<div id="d3plot">
+		<div id="job_breakdown"></div>
+		<!-- -->
+		<div id="chart">
+			<div id="stats" style="visibility: hidden;">
+				<span id="location">България</span><br />
+				<span id="percentage">" "</span><br />
+				<span id="number">" "</span>
+			</div>
+		</div>
+		<!-- -->
+	</div>
+
+	<script src="server/d3plot.js"></script>
+	<script type="text/javascript">
+		displayD3("server/data/csv/all.csv");
+	</script>
+
+</body>
+
 </html>
